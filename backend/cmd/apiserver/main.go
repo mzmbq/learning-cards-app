@@ -2,13 +2,11 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"log"
 
 	"github.com/BurntSushi/toml"
 	"github.com/mzmbq/learning-cards-app/backend/internal/app/apiserver"
 )
-
 
 var (
 	configPath string
@@ -22,12 +20,13 @@ func main() {
 	flag.Parse()
 
 	config := apiserver.NewConfig()
-	
+
 	_, err := toml.DecodeFile(configPath, config)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Println(config.BindAddr)
-	fmt.Println(config.LogLevel)
+	if err := apiserver.Start(config); err != nil {
+		log.Fatal(err)
+	}
 }
