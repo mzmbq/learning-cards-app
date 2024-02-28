@@ -10,5 +10,8 @@ build:
 run:
 	go run -C $(backend) -v ./cmd/apiserver
 
+.PHONY: clean
+clean:
+	cd $(backend) && rm ./apiserver
 
-.DEFAULT_GOAL := build
+.DEFAULT_GOAL := build 
