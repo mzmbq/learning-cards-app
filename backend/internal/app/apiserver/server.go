@@ -33,15 +33,10 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *server) configureRouter() {
-	s.mux.HandleFunc("GET /cards/", apiHandler)
 	s.mux.HandleFunc("GET /", rootHandler)
 
 	s.mux.HandleFunc("POST /api/user/create/", s.handleUserCreate())
 	s.mux.HandleFunc("GET /api/user/{id}", s.handleUserFind())
-}
-
-func apiHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "(ʘ ͜ʖ ʘ)")
 }
 
 func rootHandler(w http.ResponseWriter, r *http.Request) {
