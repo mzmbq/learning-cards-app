@@ -23,20 +23,13 @@ func newServer(store store.Store) *server {
 		store:  store,
 	}
 
-	s.configureRouter()
+	s.routes()
 
 	return s
 }
 
 func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	s.router.ServeHTTP(w, r)
-}
-
-func (s *server) configureRouter() {
-	s.router.HandleFunc("GET /", rootHandler)
-
-	s.router.Handle("POST /api/user/create/", withLogging(withCORS(s.handleUserCreate())))
-	s.router.Handle("GET /api/user/{id}", withLogging(withCORS((s.handleUserFind()))))
 }
 
 func rootHandler(w http.ResponseWriter, r *http.Request) {
