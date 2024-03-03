@@ -35,8 +35,8 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func (s *server) configureRouter() {
 	s.mux.HandleFunc("GET /", rootHandler)
 
-	s.mux.Handle("POST /api/user/create/", loggingMiddleware(enableCORS(s.handleUserCreate())))
-	s.mux.Handle("GET /api/user/{id}", loggingMiddleware(enableCORS((s.handleUserFind()))))
+	s.mux.Handle("POST /api/user/create/", withLogging(withCORS(s.handleUserCreate())))
+	s.mux.Handle("GET /api/user/{id}", withLogging(withCORS((s.handleUserFind()))))
 }
 
 func rootHandler(w http.ResponseWriter, r *http.Request) {
@@ -92,7 +92,7 @@ func (s *server) handleUserFind() http.HandlerFunc {
 
 // Middleware
 
-func enableCORS(h http.Handler) http.Handler {
+func withCORS(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Add("Access-Control-Allow-Credentials", "true")
@@ -108,7 +108,7 @@ func enableCORS(h http.Handler) http.Handler {
 	})
 }
 
-func loggingMiddleware(h http.Handler) http.Handler {
+func withLogging(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		log.Println(r.RequestURI)
 
