@@ -1,4 +1,5 @@
 backend = ./backend
+frontend = ./frontend
 
 
 .PHONY: build
@@ -8,7 +9,9 @@ build:
 
 .PHONY: run
 run:
-	go run -C $(backend) -v ./cmd/apiserver
+	go run -C $(backend) -v ./cmd/apiserver &
+	cd $(frontend) && npm start
+
 
 .PHONY: clean
 clean:
