@@ -1,14 +1,13 @@
-import Button from "./Button";
-import Card from "./Card";
+import Controls from "./Controls";
+import LearningCard from "./LearningCard";
+import { Container } from "react-bootstrap";
 
 function App() {
   return (
-    <>
-      <Card />
-      <Button text="Option 1" />
-      <Button text="Option 2" />
-      <Button text="Option 3" />
-    </>
+    <Container>
+      <LearningCard></LearningCard>
+      <Controls></Controls>
+    </Container>
   );
 }
 
