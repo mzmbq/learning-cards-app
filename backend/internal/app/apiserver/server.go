@@ -35,8 +35,8 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func (s *server) configureRouter() {
 	s.mux.HandleFunc("GET /", rootHandler)
 
-	s.mux.HandleFunc("POST /api/user/create/", s.handleUserCreate())
-	s.mux.HandleFunc("GET /api/user/{id}", s.handleUserFind())
+	s.mux.Handle("POST /api/user/create/", loggingMiddleware(enableCORS(s.handleUserCreate())))
+	s.mux.Handle("GET /api/user/{id}", loggingMiddleware(enableCORS((s.handleUserFind()))))
 }
 
 func rootHandler(w http.ResponseWriter, r *http.Request) {
@@ -88,4 +88,30 @@ func (s *server) handleUserFind() http.HandlerFunc {
 			log.Fatal(err)
 		}
 	}
+}
+
+// Middleware
+
+func enableCORS(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Add("Access-Control-Allow-Credentials", "true")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
+
+		if r.Method == "OPTIONS" {
+			http.Error(w, "No Content", http.StatusNoContent)
+			return
+		}
+
+		h.ServeHTTP(w, r)
+	})
+}
+
+func loggingMiddleware(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log.Println(r.RequestURI)
+
+		h.ServeHTTP(w, r)
+	})
 }
