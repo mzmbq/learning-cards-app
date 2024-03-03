@@ -13,14 +13,14 @@ import (
 )
 
 type server struct {
-	mux   *http.ServeMux
-	store store.Store
+	router *http.ServeMux
+	store  store.Store
 }
 
 func newServer(store store.Store) *server {
 	s := &server{
-		mux:   http.NewServeMux(),
-		store: store,
+		router: http.NewServeMux(),
+		store:  store,
 	}
 
 	s.configureRouter()
@@ -29,14 +29,14 @@ func newServer(store store.Store) *server {
 }
 
 func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	s.mux.ServeHTTP(w, r)
+	s.router.ServeHTTP(w, r)
 }
 
 func (s *server) configureRouter() {
-	s.mux.HandleFunc("GET /", rootHandler)
+	s.router.HandleFunc("GET /", rootHandler)
 
-	s.mux.Handle("POST /api/user/create/", withLogging(withCORS(s.handleUserCreate())))
-	s.mux.Handle("GET /api/user/{id}", withLogging(withCORS((s.handleUserFind()))))
+	s.router.Handle("POST /api/user/create/", withLogging(withCORS(s.handleUserCreate())))
+	s.router.Handle("GET /api/user/{id}", withLogging(withCORS((s.handleUserFind()))))
 }
 
 func rootHandler(w http.ResponseWriter, r *http.Request) {
