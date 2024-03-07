@@ -83,6 +83,44 @@ func (s *server) handleUserFind() http.HandlerFunc {
 	}
 }
 
+func (s *server) handleWordDefine() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		http.Error(w, "", http.StatusNotImplemented)
+	}
+}
+
+func (s *server) handleDeckCreate() http.HandlerFunc {
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		http.Error(w, "", http.StatusNotImplemented)
+	}
+}
+
+func (s *server) handleDeckGet() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		http.Error(w, "", http.StatusNotImplemented)
+	}
+}
+
+func (s *server) handleCardCreate() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		http.Error(w, "", http.StatusNotImplemented)
+	}
+}
+
+func (s *server) handleCardLearn() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		http.Error(w, "", http.StatusNotImplemented)
+	}
+}
+
+func (s *server) handleCardUpdate() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		http.Error(w, "", http.StatusNotImplemented)
+	}
+}
+
+
 // Middleware
 
 func withCORS(h http.Handler) http.Handler {
