@@ -6,7 +6,6 @@ import (
 	"log"
 	"net/http"
 	"strconv"
-	"strings"
 
 	"github.com/mzmbq/learning-cards-app/backend/internal/app/model"
 	"github.com/mzmbq/learning-cards-app/backend/internal/app/store"
@@ -62,7 +61,7 @@ func (s *server) handleUserCreate() http.HandlerFunc {
 func (s *server) handleUserFind() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-		idStr := strings.TrimPrefix(r.URL.Path, "/api/user/")
+		idStr := r.PathValue("id")
 
 		id, err := strconv.Atoi(idStr)
 		if err != nil {
@@ -119,7 +118,6 @@ func (s *server) handleCardUpdate() http.HandlerFunc {
 		http.Error(w, "", http.StatusNotImplemented)
 	}
 }
-
 
 // Middleware
 
