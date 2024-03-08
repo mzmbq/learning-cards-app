@@ -11,3 +11,8 @@ type DeckRepository interface {
 	Create(*model.Deck) error
 	Find(int) (*model.Deck, error)
 }
+
+type CardRepository interface {
+	Create(*model.Card) error
+	Find(int) (*model.Card, error)
+}
