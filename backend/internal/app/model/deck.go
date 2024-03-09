@@ -1,8 +1,8 @@
 package model
 
 type Deck struct {
-	ID    int
-	Cards []Card
+	ID   int
+	Name string
 
 	UserID int
 }
