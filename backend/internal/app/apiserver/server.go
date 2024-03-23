@@ -40,12 +40,21 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *server) handleUserCreate() http.HandlerFunc {
+	type request struct {
+		Email    string `json:"email"`
+		Password string `json:"password"`
+	}
+
 	return func(w http.ResponseWriter, r *http.Request) {
-		dec := json.NewDecoder(r.Body)
-		var u model.User
-		if err := dec.Decode(&u); err != nil {
+		req := request{}
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			http.Error(w, "invalid json payload", http.StatusBadRequest)
 			return
+		}
+
+		u := model.User{
+			Email:    req.Email,
+			Password: req.Password,
 		}
 
 		if err := s.store.User().Create(&u); err != nil {
