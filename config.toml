@@ -1,2 +1,3 @@
 backend_bind_addr = ":8080"
 log_level = "debug"
+database_url = "postgres://user:secret@localhost:5432/restapi_dev?sslmode=disable"
