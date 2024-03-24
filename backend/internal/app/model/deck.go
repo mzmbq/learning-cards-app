@@ -1,8 +1,8 @@
 package model
 
 type Deck struct {
-	ID   int
-	Name string
+	ID   int    `json:"id"`
+	Name string `json:"name"`
 
-	UserID int
+	UserID int `json:"user_id"`
 }

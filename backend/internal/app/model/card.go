@@ -1,9 +1,9 @@
 package model
 
 type Card struct {
-	ID    int
-	Front string
-	Back  string
+	ID    int    `json:"id"`
+	Front string `json:"front"`
+	Back  string `json:"back"`
 
-	DeckID int
+	DeckID int `json:"deck_id"`
 }
