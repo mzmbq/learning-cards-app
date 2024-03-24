@@ -69,7 +69,6 @@ func (s *server) handleUserCreate() http.HandlerFunc {
 
 func (s *server) handleUserFind() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
 		idStr := r.PathValue("id")
 
 		id, err := strconv.Atoi(idStr)
@@ -84,9 +83,10 @@ func (s *server) handleUserFind() http.HandlerFunc {
 			return
 		}
 
+		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		if err := json.NewEncoder(w).Encode(u); err != nil {
-			log.Fatal(err)
+			log.Print(err)
 		}
 	}
 }
