@@ -1,5 +1,7 @@
 package apiserver
 
+import "os"
+
 type Config struct {
 	BindAddr    string `toml:"backend_bind_addr"`
 	LogLevel    string `toml:"log_level"`
@@ -8,7 +10,8 @@ type Config struct {
 
 func NewConfig() *Config {
 	return &Config{
-		BindAddr: ":8081",
-		LogLevel: "debug",
+		BindAddr:    ":8081",
+		LogLevel:    "debug",
+		DatabaseURL: os.Getenv("DATABASE_URL"),
 	}
 }
