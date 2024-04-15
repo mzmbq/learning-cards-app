@@ -31,7 +31,14 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	s.router.ServeHTTP(w, r)
 }
 
-func rootHandler(w http.ResponseWriter, r *http.Request) {
+func (s *server) WriteJSON(w http.ResponseWriter, status int, v any) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(status)
+
+	return json.NewEncoder(w).Encode(v)
+}
+
+func handleRoot(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
 		http.NotFound(w, r)
 		return
@@ -62,8 +69,9 @@ func (s *server) handleUserCreate() http.HandlerFunc {
 			return
 		}
 
-		w.WriteHeader(http.StatusOK)
-		fmt.Fprint(w, u.ID)
+		if err := s.WriteJSON(w, http.StatusOK, u.ID); err != nil {
+			log.Println(err)
+		}
 	}
 }
 
@@ -83,10 +91,8 @@ func (s *server) handleUserFind() http.HandlerFunc {
 			return
 		}
 
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		if err := json.NewEncoder(w).Encode(u); err != nil {
-			log.Print(err)
+		if err := s.WriteJSON(w, http.StatusOK, u); err != nil {
+			fmt.Println(err)
 		}
 	}
 }
