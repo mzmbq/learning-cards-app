@@ -9,7 +9,7 @@ build:
 	@go build -C $(backend) -v ./cmd/apiserver
 
 run:
-	@set -a; . ./.env; set +a; go run -C $(backend) -v ./cmd/apiserver
+	@go run -C $(backend) -v ./cmd/apiserver
 
 run_all:
 	@go run -C $(backend) -v ./cmd/apiserver &
