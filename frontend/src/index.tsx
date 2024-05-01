@@ -6,11 +6,14 @@ import {
   RouterProvider,
 } from "react-router-dom";
 
+import { MantineProvider } from '@mantine/core';
+import '@mantine/core/styles.css';
+
 import App from './components/App';
 import Login from './components/Login';
+import SignUp from './components/SignUp';
 
-
-let router = createBrowserRouter([
+const router = createBrowserRouter([
   {
     path: "/",
     element: <App />,
@@ -18,6 +21,10 @@ let router = createBrowserRouter([
   {
     path: "/login",
     element: <Login />,
+  },
+  {
+    path: "/signup",
+    element: <SignUp />,
   }
 ])
 
@@ -28,6 +35,8 @@ const root = ReactDOM.createRoot(
 
 root.render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <MantineProvider>
+      <RouterProvider router={router} />
+    </MantineProvider>
   </React.StrictMode>
 );
