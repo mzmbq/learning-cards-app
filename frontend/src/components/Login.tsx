@@ -2,6 +2,7 @@ import { TextInput, Button, Group, Box, PasswordInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { Link } from 'react-router-dom';
 
+
 function Login() {
   const form = useForm({
     mode: 'uncontrolled',
@@ -16,7 +17,6 @@ function Login() {
   });
 
 
-  console.log(form.getInputProps("email"))
 
   return (
     <Box maw={340} mx="auto">
@@ -37,7 +37,7 @@ function Login() {
         />
 
         <Group justify="flex-end" mt="md">
-          <Button type="submit">Sign in</Button>
+          <Button type="submit">Log in</Button>
         </Group>
       </form>
 

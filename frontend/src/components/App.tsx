@@ -7,7 +7,7 @@ function App() {
       <Box m="auto" maw={800}>
         <h1>App</h1>
         <p><Link to="/login">Log in</Link></p>
-        <p><Link to="/signup">Register</Link></p>
+        <p><Link to="/signup">Sign up</Link></p>
       </Box>
     </>
   )

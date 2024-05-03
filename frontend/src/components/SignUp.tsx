@@ -1,8 +1,19 @@
-import { TextInput, Button, Group, Box, PasswordInput } from '@mantine/core';
+import { TextInput, Button, Group, Box, PasswordInput, LoadingOverlay } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { Link } from 'react-router-dom';
 
+import CONFIG from '../config';
+import { useState } from 'react';
+
+type SignUpFormValues = {
+  email: string;
+  password: string;
+};
+
 function SignUp() {
+  const [success, setSuccess] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
   const form = useForm({
     mode: 'uncontrolled',
     initialValues: {
@@ -15,13 +26,42 @@ function SignUp() {
     },
   });
 
+  const handleSubmit = async (values: SignUpFormValues) => {
+    setIsLoading(true);
+
+    try {
+      const response = await fetch(`${CONFIG.backendURL}/api/user/create`, {
+        method: "POST",
+        body: JSON.stringify(values),
+      })
+
+      if (!response.ok) {
+        throw new Error("Sign up failed");
+      }
+
+      setSuccess(true);
+
+      const text = response.body ? await response.text() : '';
+      console.log(text);
+
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   console.log(form.getInputProps("email"))
 
   return (
     <Box maw={340} mx="auto">
+      <LoadingOverlay visible={isLoading} />
+
+      {success && <p>Success!</p>}
+
       <h2>Create an account</h2>
-      <form onSubmit={form.onSubmit((values) => console.log(values))}>
+
+      <form onSubmit={form.onSubmit(handleSubmit)}>
         <TextInput
           label="Email Address"
           placeholder=""
