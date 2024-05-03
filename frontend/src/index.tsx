@@ -12,6 +12,8 @@ import '@mantine/core/styles.css';
 import App from './components/App';
 import Login from './components/Login';
 import SignUp from './components/SignUp';
+import CardBrowser from './components/CardBrowser';
+import DeckBrowser from './components/DeckBrowser';
 
 const router = createBrowserRouter([
   {
@@ -25,7 +27,15 @@ const router = createBrowserRouter([
   {
     path: "/signup",
     element: <SignUp />,
-  }
+  },
+  {
+    path: "/decks",
+    element: <DeckBrowser />,
+  },
+  {
+    path: "/cards",
+    element: <CardBrowser />,
+  },
 ])
 
 
@@ -38,5 +48,5 @@ root.render(
     <MantineProvider>
       <RouterProvider router={router} />
     </MantineProvider>
-  </React.StrictMode>
+  </React.StrictMode >
 );

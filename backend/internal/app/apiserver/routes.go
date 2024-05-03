@@ -8,8 +8,9 @@ func (s *server) routes() {
 
 	s.router.Handle("GET /api/word", s.handleWordDefine())
 
+	s.router.Handle("GET /api/decks", withLogging(withCORS(s.handleDecksList())))
 	s.router.Handle("POST /api/deck", s.handleDeckCreate())
-	s.router.Handle("GET /api/deck/{id}", s.handleDeckGet())
+	s.router.Handle("GET /api/deck/{id}", withLogging(withCORS(s.handleDeckGet())))
 
 	s.router.Handle("POST /api/card", s.handleCardCreate())
 	s.router.Handle("GET /api/deck/{deckId}/card", s.handleCardLearn())

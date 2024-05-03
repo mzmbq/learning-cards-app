@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/mzmbq/learning-cards-app/backend/internal/app/model"
 	"github.com/mzmbq/learning-cards-app/backend/internal/app/store"
@@ -104,15 +105,53 @@ func (s *server) handleWordDefine() http.HandlerFunc {
 }
 
 func (s *server) handleDeckCreate() http.HandlerFunc {
-
 	return func(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "", http.StatusNotImplemented)
 	}
 }
 
-func (s *server) handleDeckGet() http.HandlerFunc {
+func (s *server) handleDecksList() http.HandlerFunc {
+
+	type response struct {
+		Decks []model.Deck `json:"decks"`
+	}
+
 	return func(w http.ResponseWriter, r *http.Request) {
-		http.Error(w, "", http.StatusNotImplemented)
+		time.Sleep(500 * time.Millisecond)
+
+		res := response{
+			Decks: []model.Deck{},
+		}
+
+		for i := range 20 {
+			res.Decks = append(res.Decks, model.Deck{
+				ID:     i,
+				Name:   fmt.Sprintf("Deck %d", i),
+				UserID: 1,
+			})
+		}
+
+		s.WriteJSON(w, 200, res)
+	}
+
+}
+
+func (s *server) handleDeckGet() http.HandlerFunc {
+
+	type response struct {
+		Cards []model.Card `json:"cards"`
+	}
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		time.Sleep(500 * time.Millisecond)
+
+		s.WriteJSON(w, 200, response{Cards: []model.Card{
+			{ID: 1, DeckID: 1, Front: "Front 1", Back: "Back 1"},
+			{ID: 2, DeckID: 1, Front: "Front 2", Back: "Back 2"},
+			{ID: 3, DeckID: 1, Front: "Front 3", Back: "Back 3"},
+			{ID: 4, DeckID: 1, Front: "Front 4", Back: "Back 4"},
+			{ID: 5, DeckID: 1, Front: "Front 5", Back: "Back 5"},
+		}})
 	}
 }
 
