@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/mzmbq/learning-cards-app/backend/internal/app/model"
@@ -78,15 +77,9 @@ func (s *server) handleUserCreate() http.HandlerFunc {
 
 func (s *server) handleUserFind() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		idStr := r.PathValue("id")
+		email := r.PathValue("email")
 
-		id, err := strconv.Atoi(idStr)
-		if err != nil {
-			http.Error(w, "invalid id", http.StatusBadRequest)
-			return
-		}
-
-		u, err := s.store.User().Find(id)
+		u, err := s.store.User().Find(email)
 		if err != nil {
 			http.Error(w, "user not found", http.StatusNotFound)
 			return
@@ -95,6 +88,23 @@ func (s *server) handleUserFind() http.HandlerFunc {
 		if err := s.WriteJSON(w, http.StatusOK, u); err != nil {
 			fmt.Println(err)
 		}
+	}
+}
+
+func (s *server) handleUserAuth() http.HandlerFunc {
+	type request struct {
+		Email    string `json:"email"`
+		Password string `json:"password"`
+	}
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		req := request{}
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			http.Error(w, "invalid json payload", http.StatusBadRequest)
+			return
+		}
+
+		http.Error(w, "", http.StatusNotImplemented)
 	}
 }
 

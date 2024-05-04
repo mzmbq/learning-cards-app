@@ -7,25 +7,25 @@ import (
 
 type UserRepository struct {
 	store *Store
-	users map[int]*model.User
+	users map[string]*model.User
 }
 
 func newUserRepo(s *Store) *UserRepository {
 	return &UserRepository{
 		store: s,
-		users: make(map[int]*model.User),
+		users: make(map[string]*model.User),
 	}
 }
 
 func (r *UserRepository) Create(u *model.User) error {
 	u.ID = len(r.users) + 1
-	r.users[u.ID] = u
+	r.users[u.Email] = u
 
 	return nil
 }
 
-func (r *UserRepository) Find(id int) (*model.User, error) {
-	u, ok := r.users[id]
+func (r *UserRepository) Find(email string) (*model.User, error) {
+	u, ok := r.users[email]
 	if !ok {
 		return nil, store.ErrRecordNotFound
 	}
