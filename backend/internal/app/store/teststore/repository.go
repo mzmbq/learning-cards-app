@@ -18,6 +18,8 @@ func newUserRepo(s *Store) *UserRepository {
 }
 
 func (r *UserRepository) Create(u *model.User) error {
+	u.BeforeCreate()
+
 	u.ID = len(r.users) + 1
 	r.users[u.Email] = u
 

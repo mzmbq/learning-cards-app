@@ -104,7 +104,13 @@ func (s *server) handleUserAuth() http.HandlerFunc {
 			return
 		}
 
-		http.Error(w, "", http.StatusNotImplemented)
+		u, err := s.store.User().Find(req.Email)
+		if err != nil || !u.CheckPassword(req.Password) {
+			http.Error(w, "", http.StatusUnauthorized)
+		}
+
+		s.WriteJSON(w, http.StatusOK, u.ID)
+
 	}
 }
 
