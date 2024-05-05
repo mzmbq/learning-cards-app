@@ -4,8 +4,9 @@ func (s *server) routes() {
 	s.router.HandleFunc("GET /", handleRoot)
 
 	s.router.Handle("POST /api/user/create", withLogging(withCORS(s.handleUserCreate())))
-	s.router.Handle("GET /api/user/{email}", withLogging(withCORS((s.handleUserFind()))))
 	s.router.Handle("POST /api/user/auth", withLogging(withCORS(s.handleUserAuth())))
+	s.router.Handle("GET /api/user/{email}", withLogging(withCORS((s.handleUserFind()))))
+	s.router.Handle("GET /api/user/whoami", withLogging(withCORS(s.handleUserWhoami())))
 
 	s.router.Handle("GET /api/word", s.handleWordDefine())
 

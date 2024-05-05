@@ -1,15 +1,14 @@
 include .env
 
 DATABASE_URL=postgresql://$(DB_USERNAME):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_DATABASE)?sslmode=disable
-backend = ./backend
-frontend = ./frontend
-
+backend=./backend
+frontend=./frontend
 
 build:
 	@go build -C $(backend) -v ./cmd/apiserver
 
 run:
-	@go run -C $(backend) -v ./cmd/apiserver
+	@SESSION_KEY=$(SESSION_KEY) go run -C $(backend) -v ./cmd/apiserver
 
 run_all:
 	@go run -C $(backend) -v ./cmd/apiserver &

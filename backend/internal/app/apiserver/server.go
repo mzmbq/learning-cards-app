@@ -7,19 +7,25 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/gorilla/sessions"
+
 	"github.com/mzmbq/learning-cards-app/backend/internal/app/model"
 	"github.com/mzmbq/learning-cards-app/backend/internal/app/store"
 )
 
+const sessionName = "session"
+
 type server struct {
-	router *http.ServeMux
-	store  store.Store
+	router        *http.ServeMux
+	store         store.Store
+	sessionsStore sessions.Store
 }
 
-func newServer(store store.Store) *server {
+func newServer(store store.Store, sessionsStore sessions.Store) *server {
 	s := &server{
-		router: http.NewServeMux(),
-		store:  store,
+		router:        http.NewServeMux(),
+		store:         store,
+		sessionsStore: sessionsStore,
 	}
 
 	s.routes()
@@ -100,6 +106,7 @@ func (s *server) handleUserAuth() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		req := request{}
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			log.Println(err)
 			http.Error(w, "invalid json payload", http.StatusBadRequest)
 			return
 		}
@@ -107,10 +114,45 @@ func (s *server) handleUserAuth() http.HandlerFunc {
 		u, err := s.store.User().Find(req.Email)
 		if err != nil || !u.CheckPassword(req.Password) {
 			http.Error(w, "", http.StatusUnauthorized)
+			return
+		}
+
+		session, err := s.sessionsStore.Get(r, sessionName)
+		if err != nil {
+			log.Println(err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		session.Values["user_id"] = u.ID
+		session.Values["email"] = u.Email
+
+		err = session.Save(r, w)
+		if err != nil {
+			log.Println(err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
 		}
 
 		s.WriteJSON(w, http.StatusOK, u.ID)
+	}
+}
 
+func (s *server) handleUserWhoami() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		session, err := s.sessionsStore.Get(r, sessionName)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		email, ok := session.Values["email"]
+		if !ok {
+			http.Error(w, "", http.StatusUnauthorized)
+			return
+		}
+
+		s.WriteJSON(w, http.StatusOK, struct{ Email string }{Email: email.(string)})
 	}
 }
 

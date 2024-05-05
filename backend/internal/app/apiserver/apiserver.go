@@ -3,10 +3,13 @@ package apiserver
 import (
 	"context"
 	"database/sql"
+	"encoding/hex"
+	"fmt"
 	"log"
 	"net/http"
 	"time"
 
+	"github.com/gorilla/sessions"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/mzmbq/learning-cards-app/backend/internal/app/store/sqlstore"
 )
@@ -18,7 +21,15 @@ func Start(config *Config) error {
 	}
 	store := sqlstore.New(db)
 
-	srv := newServer(store)
+	fmt.Println("Session key length:", len(config.SessionKey))
+	key, err := hex.DecodeString(config.SessionKey)
+	if err != nil {
+		return err
+	}
+	// key := []byte(config.SessionKey)
+	sessionStore := sessions.NewCookieStore(key)
+
+	srv := newServer(store, sessionStore)
 
 	return http.ListenAndServe(config.BindAddr, srv)
 }
