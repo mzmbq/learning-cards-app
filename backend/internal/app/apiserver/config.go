@@ -1,19 +1,15 @@
 package apiserver
 
-import "os"
-
 type Config struct {
-	BindAddr    string `toml:"backend_bind_addr"`
-	LogLevel    string `toml:"log_level"`
-	DatabaseURL string `toml:"database_url"`
-	SessionKey  string `toml:"session_key"`
+	BindAddr    string `toml:"backend_bind_addr" envconfig:"BIND_ADDR"`
+	LogLevel    string `toml:"log_level" envconfig:"LOG_LEVEL"`
+	DatabaseURL string `toml:"database_url" envconfig:"DATABASE_URL"`
+	SessionKey  string `toml:"session_key" envconfig:"SESSION_KEY"`
 }
 
 func NewConfig() *Config {
 	return &Config{
-		BindAddr:    ":8081",
-		LogLevel:    "debug",
-		DatabaseURL: os.Getenv("DATABASE_URL"),
-		SessionKey:  os.Getenv("SESSION_KEY"),
+		BindAddr: ":8080",
+		LogLevel: "debug",
 	}
 }
