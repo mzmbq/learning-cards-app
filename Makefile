@@ -1,37 +1,42 @@
 include .env
 
-DATABASE_URL=postgresql://$(DB_USERNAME):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_DATABASE)?sslmode=disable
-backend=./backend
-frontend=./frontend
+export DATABASE_URL=postgresql://$(DB_USERNAME):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_DATABASE)?sslmode=disable
+export SESSION_KEY
 
+.PHONY: build
 build:
-	@go build -C $(backend) -v ./cmd/apiserver
+	@go build -o ./bin/apiserver -v ./cmd/apiserver
 
+.PHONY: run
 run:
-	@SESSION_KEY=$(SESSION_KEY) go run -C $(backend) -v ./cmd/apiserver
+	@go run -v ./cmd/apiserver
 
-run_all:
-	@go run -C $(backend) -v ./cmd/apiserver &
-	@cd $(frontend) && npm start
+.PHONY: run_frontend
+run_frontend:
+	@cd frontend && npm start
 
+.PHONY: clean
 clean:
-	@cd $(backend) && rm ./apiserver
+	@rm ./apiserver
 
+.PHONY: migrate_up
 migrate_up:
-	@cd $(backend) && migrate -path=./migrations -database=$(DATABASE_URL) -verbose up
+	@migrate -path=./migrations -database=$(DATABASE_URL) -verbose up
 
+.PHONY: migrate_down
 migrate_down:
-	@cd $(backend) && migrate -path=./migrations -database=$(DATABASE_URL) -verbose down
+	@migrate -path=./migrations -database=$(DATABASE_URL) -verbose down
 
+.PHONY: db_up
 db_up:
 	@echo "Starting database container..."
 	@docker compose up -d
 
+.PHONY: db_down
 db_down:
 	@echo "Stopping database container..."
 	@docker compose down
 
 
-.PHONY: build run run_all clean migrate_up migrate_down db_up db_down
 
 .DEFAULT_GOAL := build
