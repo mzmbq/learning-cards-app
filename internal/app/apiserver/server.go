@@ -113,14 +113,14 @@ func (s *server) handleUserAuth() http.HandlerFunc {
 
 		u, err := s.store.User().Find(req.Email)
 		if err != nil || !u.CheckPassword(req.Password) {
-			http.Error(w, "", http.StatusUnauthorized)
+			http.Error(w, "email or password incorrect", http.StatusUnauthorized)
 			return
 		}
 
 		session, err := s.sessionsStore.Get(r, sessionName)
 		if err != nil {
 			log.Println(err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			http.Error(w, "", http.StatusInternalServerError)
 			return
 		}
 
@@ -130,7 +130,7 @@ func (s *server) handleUserAuth() http.HandlerFunc {
 		err = session.Save(r, w)
 		if err != nil {
 			log.Println(err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			http.Error(w, "", http.StatusInternalServerError)
 			return
 		}
 

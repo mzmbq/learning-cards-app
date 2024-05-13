@@ -1,4 +1,4 @@
-import { TextInput, Button, Group, Box, PasswordInput, LoadingOverlay } from '@mantine/core';
+import { TextInput, Button, Group, Box, PasswordInput, LoadingOverlay, Modal } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -24,6 +24,7 @@ function Login() {
 
     validate: {
       email: (value) => (/^\S+@\S+$/.test(value) ? null : 'Invalid email'),
+      password: (value) => (value.length >= 0 ? null : 'Password is too short'),
     },
   });
 
@@ -35,7 +36,8 @@ function Login() {
       });
 
       if (!response.ok) {
-        throw new Error("Login failed");
+        let errorText = await response.text();
+        throw new Error("Login failed: " + errorText);
       }
 
       setSuccess(true);
@@ -52,6 +54,9 @@ function Login() {
   return (
     <Box maw={340} mx="auto">
       <LoadingOverlay visible={loading} />
+
+      {error &&
+        <Modal opened={true} onClose={() => { setError(null) }} withCloseButton={true} title={error} />}
 
       <h2>Sign in to your account</h2>
       <form onSubmit={form.onSubmit((values) => doAuth(values))}>
