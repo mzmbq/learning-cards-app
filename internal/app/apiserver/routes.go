@@ -1,21 +1,24 @@
 package apiserver
 
 func (s *server) routes() {
-	s.router.HandleFunc("GET /", handleRoot)
+	s.mux.AddMiddleware(withCORS)
+	s.mux.AddMiddleware(withLogging)
 
-	s.router.Handle("POST /api/user/create", withLogging(withCORS(s.handleUserCreate())))
-	s.router.Handle("POST /api/user/auth", withLogging(withCORS(s.handleUserAuth())))
-	s.router.Handle("GET /api/user/{email}", withLogging(withCORS((s.handleUserFind()))))
-	s.router.Handle("GET /api/user/whoami", withLogging(withCORS(s.handleUserWhoami())))
+	s.mux.HandleFunc("GET /", handleRoot)
 
-	s.router.Handle("GET /api/word", s.handleWordDefine())
+	s.mux.Handle("POST /api/user/create", s.handleUserCreate())
+	s.mux.Handle("POST /api/user/auth", s.handleUserAuth())
+	s.mux.Handle("GET /api/user/{email}", s.handleUserFind())
+	s.mux.Handle("GET /api/user/whoami", s.handleUserWhoami())
 
-	s.router.Handle("GET /api/decks", withLogging(withCORS(s.handleDecksList())))
-	s.router.Handle("POST /api/deck", s.handleDeckCreate())
-	s.router.Handle("GET /api/deck/{id}", withLogging(withCORS(s.handleDeckGet())))
+	s.mux.Handle("GET /api/word", s.handleWordDefine())
 
-	s.router.Handle("POST /api/card", s.handleCardCreate())
-	s.router.Handle("GET /api/deck/{deckId}/card", s.handleCardLearn())
-	s.router.Handle("POST /api/card/{id}", s.handleCardUpdate())
+	s.mux.Handle("GET /api/decks", s.handleDecksList())
+	s.mux.Handle("POST /api/deck", s.handleDeckCreate())
+	s.mux.Handle("GET /api/deck/{id}", s.handleDeckGet())
+
+	s.mux.Handle("POST /api/card", s.handleCardCreate())
+	s.mux.Handle("GET /api/deck/{deckId}/card", s.handleCardLearn())
+	s.mux.Handle("POST /api/card/{id}", s.handleCardUpdate())
 
 }

@@ -16,14 +16,14 @@ import (
 const sessionName = "session"
 
 type server struct {
-	router        *http.ServeMux
+	mux           *middlewareMux
 	store         store.Store
 	sessionsStore sessions.Store
 }
 
 func newServer(store store.Store, sessionsStore sessions.Store) *server {
 	s := &server{
-		router:        http.NewServeMux(),
+		mux:           newMiddlewareMux(),
 		store:         store,
 		sessionsStore: sessionsStore,
 	}
@@ -34,7 +34,7 @@ func newServer(store store.Store, sessionsStore sessions.Store) *server {
 }
 
 func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	s.router.ServeHTTP(w, r)
+	s.mux.ServeHTTP(w, r)
 }
 
 func (s *server) WriteJSON(w http.ResponseWriter, status int, v any) error {
@@ -138,6 +138,14 @@ func (s *server) handleUserAuth() http.HandlerFunc {
 	}
 }
 
+func (s *server) handlerUserSignOut() http.HandlerFunc {
+
+	return func(w http.ResponseWriter, r *http.Request) {
+
+	}
+
+}
+
 func (s *server) handleUserWhoami() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		session, err := s.sessionsStore.Get(r, sessionName)
@@ -229,30 +237,4 @@ func (s *server) handleCardUpdate() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "", http.StatusNotImplemented)
 	}
-}
-
-// Middleware
-
-func withCORS(h http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Add("Access-Control-Allow-Credentials", "true")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
-
-		if r.Method == "OPTIONS" {
-			http.Error(w, "No Content", http.StatusNoContent)
-			return
-		}
-
-		h.ServeHTTP(w, r)
-	})
-}
-
-func withLogging(h http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.Println(r.RequestURI)
-
-		h.ServeHTTP(w, r)
-	})
 }
