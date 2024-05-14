@@ -15,6 +15,10 @@ import (
 
 const sessionName = "session"
 
+type contextKey string
+
+const ctxKeyUserID contextKey = "userID"
+
 type server struct {
 	mux           *middlewareMux
 	store         store.Store
@@ -85,7 +89,7 @@ func (s *server) handleUserFind() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		email := r.PathValue("email")
 
-		u, err := s.store.User().Find(email)
+		u, err := s.store.User().FindByEmail(email)
 		if err != nil {
 			http.Error(w, "user not found", http.StatusNotFound)
 			return
@@ -111,7 +115,7 @@ func (s *server) handleUserAuth() http.HandlerFunc {
 			return
 		}
 
-		u, err := s.store.User().Find(req.Email)
+		u, err := s.store.User().FindByEmail(req.Email)
 		if err != nil || !u.CheckPassword(req.Password) {
 			http.Error(w, "email or password incorrect", http.StatusUnauthorized)
 			return
@@ -124,7 +128,7 @@ func (s *server) handleUserAuth() http.HandlerFunc {
 			return
 		}
 
-		session.Values["user_id"] = u.ID
+		session.Values["userID"] = u.ID
 		session.Values["email"] = u.Email
 
 		err = session.Save(r, w)
@@ -139,28 +143,40 @@ func (s *server) handleUserAuth() http.HandlerFunc {
 }
 
 func (s *server) handlerUserSignOut() http.HandlerFunc {
-
 	return func(w http.ResponseWriter, r *http.Request) {
+		session, err := s.sessionsStore.Get(r, sessionName)
+		if err != nil {
+			http.Error(w, "", http.StatusUnauthorized)
+			return
+		}
 
+		delete(session.Values, "userID")
+		session.Save(r, w)
 	}
 
 }
 
 func (s *server) handleUserWhoami() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		session, err := s.sessionsStore.Get(r, sessionName)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-
-		email, ok := session.Values["email"]
-		if !ok {
+		id := r.Context().Value(ctxKeyUserID)
+		if id == nil {
 			http.Error(w, "", http.StatusUnauthorized)
 			return
 		}
 
-		s.WriteJSON(w, http.StatusOK, struct{ Email string }{Email: email.(string)})
+		idInt, ok := id.(int)
+		if !ok {
+			http.Error(w, "", http.StatusInternalServerError)
+			return
+		}
+
+		u, err := s.store.User().Find(idInt)
+		if err != nil {
+			http.Error(w, "", http.StatusUnauthorized)
+			return
+		}
+
+		s.WriteJSON(w, http.StatusOK, u)
 	}
 }
 

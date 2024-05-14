@@ -9,7 +9,8 @@ func (s *server) routes() {
 	s.mux.Handle("POST /api/user/create", s.handleUserCreate())
 	s.mux.Handle("POST /api/user/auth", s.handleUserAuth())
 	s.mux.Handle("GET /api/user/{email}", s.handleUserFind())
-	s.mux.Handle("GET /api/user/whoami", s.handleUserWhoami())
+	s.mux.Handle("GET /api/user/whoami", s.withAuth(s.handleUserWhoami()))
+	s.mux.Handle("GET /api/user/signout", s.handlerUserSignOut())
 
 	s.mux.Handle("GET /api/word", s.handleWordDefine())
 

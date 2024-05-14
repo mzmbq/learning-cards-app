@@ -1,6 +1,7 @@
 package apiserver
 
 import (
+	"context"
 	"log"
 	"net/http"
 )
@@ -62,5 +63,24 @@ func withLogging(h http.Handler) http.Handler {
 		log.Println(r.RequestURI)
 
 		h.ServeHTTP(w, r)
+	})
+}
+
+func (s *server) withAuth(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		session, err := s.sessionsStore.Get(r, sessionName)
+		if err != nil {
+			http.Error(w, "", http.StatusUnauthorized)
+			return
+		}
+
+		id, ok := session.Values["userID"]
+		if !ok {
+			http.Error(w, "", http.StatusUnauthorized)
+			return
+		}
+
+		ctx := context.WithValue(r.Context(), ctxKeyUserID, id)
+		h.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
