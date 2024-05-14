@@ -4,7 +4,8 @@ import "github.com/mzmbq/learning-cards-app/backend/internal/app/model"
 
 type UserRepository interface {
 	Create(*model.User) error
-	Find(emal string) (*model.User, error)
+	Find(id int) (*model.User, error)
+	FindByEmail(emal string) (*model.User, error)
 }
 
 type DeckRepository interface {

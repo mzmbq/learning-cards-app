@@ -14,7 +14,7 @@ func New() *Store {
 
 func (s *Store) User() store.UserRepository {
 	if s.userRepository == nil {
-		s.userRepository = newUserRepo(s)
+		s.userRepository = NewUserRepo(s)
 	}
 
 	return s.userRepository

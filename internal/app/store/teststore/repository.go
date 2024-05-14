@@ -10,7 +10,7 @@ type UserRepository struct {
 	users map[string]*model.User
 }
 
-func newUserRepo(s *Store) *UserRepository {
+func NewUserRepo(s *Store) *UserRepository {
 	return &UserRepository{
 		store: s,
 		users: make(map[string]*model.User),
@@ -26,7 +26,17 @@ func (r *UserRepository) Create(u *model.User) error {
 	return nil
 }
 
-func (r *UserRepository) Find(email string) (*model.User, error) {
+func (r *UserRepository) Find(id int) (*model.User, error) {
+	for _, user := range r.users {
+		if user.ID == id {
+			return user, nil
+		}
+	}
+
+	return nil, store.ErrRecordNotFound
+}
+
+func (r *UserRepository) FindByEmail(email string) (*model.User, error) {
 	u, ok := r.users[email]
 	if !ok {
 		return nil, store.ErrRecordNotFound
