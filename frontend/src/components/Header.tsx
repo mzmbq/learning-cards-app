@@ -12,22 +12,22 @@ export function Header() {
   return (
     <Box pb={30}>
       <header className={classes.header}>
-        <Group justify="space-between" h="100%">
+        <Group justify="space-between">
 
-          <div className={classes.logo}>
+          <Group className={classes.logo}>
             <img src="/logo.svg" />
-          </div>
+          </Group>
 
           <Group h="100%" gap={0}>
             <Link to="/study" className={classes.link}>
               Study
             </Link>
 
-            <Link to="/my-decks" className={classes.link}>
+            <Link to="/decks" className={classes.link}>
               My Decks
             </Link>
 
-            <Link to="/new-card" className={classes.link}>
+            <Link to="/cards" className={classes.link}>
               New Card
             </Link>
           </Group>
