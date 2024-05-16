@@ -58,7 +58,7 @@ function Login() {
       {error &&
         <Modal opened={true} onClose={() => { setError(null) }} withCloseButton={true} title={error} />}
 
-      <h2>Sign in to your account</h2>
+      <h2>Log in to your account</h2>
       <form onSubmit={form.onSubmit((values) => doAuth(values))}>
         <TextInput
           label="Email Address"
