@@ -41,11 +41,14 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	s.mux.ServeHTTP(w, r)
 }
 
-func (s *server) WriteJSON(w http.ResponseWriter, status int, v any) error {
+func (s *server) WriteJSON(w http.ResponseWriter, status int, v any) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
 
-	return json.NewEncoder(w).Encode(v)
+	err := json.NewEncoder(w).Encode(v)
+	if err != nil {
+		log.Println(err)
+	}
 }
 
 func handleRoot(w http.ResponseWriter, r *http.Request) {
@@ -79,9 +82,7 @@ func (s *server) handleUserCreate() http.HandlerFunc {
 			return
 		}
 
-		if err := s.WriteJSON(w, http.StatusOK, u.ID); err != nil {
-			log.Println(err)
-		}
+		s.WriteJSON(w, http.StatusOK, u.ID)
 	}
 }
 
@@ -95,9 +96,8 @@ func (s *server) handleUserFind() http.HandlerFunc {
 			return
 		}
 
-		if err := s.WriteJSON(w, http.StatusOK, u); err != nil {
-			fmt.Println(err)
-		}
+		s.WriteJSON(w, http.StatusOK, u)
+
 	}
 }
 

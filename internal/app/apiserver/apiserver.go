@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"encoding/hex"
-	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -22,7 +21,7 @@ func Start(config *Config) error {
 	store := sqlstore.New(db)
 
 	key, err := hex.DecodeString(config.SessionKey)
-	fmt.Println("Session key length:", len(key))
+	log.Println("Session key length:", len(key))
 	if err != nil {
 		return err
 	}
