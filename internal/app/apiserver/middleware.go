@@ -42,16 +42,21 @@ func (m *middlewareMux) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 // Middlewares
 
-func withCORS(h http.Handler) http.Handler {
+func (s *server) withCORS(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Add("Access-Control-Allow-Credentials", "true")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
+		w.Header().Add("Vary", "Origin")
 
-		if r.Method == "OPTIONS" {
-			http.Error(w, "No Content", http.StatusNoContent)
-			return
+		origin := r.Header.Get("Origin")
+		if origin == "" {
+			h.ServeHTTP(w, r)
+		}
+
+		for _, o := range s.corsOrigins {
+			if origin == o {
+				w.Header().Set("Access-Control-Allow-Origin", o)
+				w.Header().Set("Access-Control-Allow-Credentials", "true")
+				break
+			}
 		}
 
 		h.ServeHTTP(w, r)

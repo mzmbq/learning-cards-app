@@ -1,7 +1,7 @@
 package apiserver
 
 func (s *server) routes() {
-	s.mux.AddMiddleware(withCORS)
+	s.mux.AddMiddleware(s.withCORS)
 	s.mux.AddMiddleware(withLogging)
 
 	s.mux.HandleFunc("GET /", handleRoot)

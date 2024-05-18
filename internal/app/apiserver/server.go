@@ -23,13 +23,16 @@ type server struct {
 	mux           *middlewareMux
 	store         store.Store
 	sessionsStore sessions.Store
+
+	corsOrigins []string
 }
 
-func newServer(store store.Store, sessionsStore sessions.Store) *server {
+func newServer(store store.Store, sessionsStore sessions.Store, corsOrigins []string) *server {
 	s := &server{
 		mux:           newMiddlewareMux(),
 		store:         store,
 		sessionsStore: sessionsStore,
+		corsOrigins:   corsOrigins,
 	}
 
 	s.routes()

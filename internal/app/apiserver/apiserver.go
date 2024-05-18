@@ -20,15 +20,14 @@ func Start(config *Config) error {
 	}
 	store := sqlstore.New(db)
 
-	key, err := hex.DecodeString(config.SessionKey)
-	log.Println("Session key length:", len(key))
+	sessionKey, err := hex.DecodeString(config.SessionKey)
+	log.Println("Session key length:", len(sessionKey))
 	if err != nil {
 		return err
 	}
-	// key := []byte(config.SessionKey)
-	sessionStore := sessions.NewCookieStore(key)
+	sessionStore := sessions.NewCookieStore(sessionKey)
 
-	srv := newServer(store, sessionStore)
+	srv := newServer(store, sessionStore, config.CORSOrigins)
 
 	return http.ListenAndServe(config.BindAddr, srv)
 }
