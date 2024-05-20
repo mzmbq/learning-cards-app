@@ -33,6 +33,7 @@ function Login() {
       const response = await fetch(`${CONFIG.backendURL}/api/user/auth`, {
         method: "POST",
         body: JSON.stringify(values),
+        credentials: "include",
       });
 
       if (!response.ok) {

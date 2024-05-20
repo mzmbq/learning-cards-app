@@ -17,6 +17,7 @@ import Header from './components/Header';
 import Login from './components/Login';
 import SignUp from './components/SignUp';
 import ErrorPage from './components/ErrorPage';
+import StudyPage from './components/StudyPage';
 
 const router = createBrowserRouter([
   {
@@ -43,6 +44,10 @@ const router = createBrowserRouter([
         path: "/cards",
         element: <CardBrowser />,
       },
+      {
+        path: "/study",
+        element: <StudyPage />,
+      }
     ],
   },
 ])
