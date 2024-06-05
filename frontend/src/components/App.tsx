@@ -1,5 +1,5 @@
-import { Box } from '@mantine/core'
-import { Link } from 'react-router-dom'
+import { Box } from "@mantine/core"
+import { Link } from "react-router-dom"
 
 function App() {
   return (

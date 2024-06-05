@@ -1,9 +1,9 @@
-import { TextInput, Button, Group, Box, PasswordInput, LoadingOverlay } from '@mantine/core';
-import { useForm } from '@mantine/form';
-import { Link } from 'react-router-dom';
+import { TextInput, Button, Group, Box, PasswordInput, LoadingOverlay } from "@mantine/core";
+import { useForm } from "@mantine/form";
+import { Link } from "react-router-dom";
 
-import CONFIG from '../config';
-import { useState } from 'react';
+import CONFIG from "../config";
+import { useState } from "react";
 
 type SignUpFormValues = {
   email: string;
@@ -15,14 +15,14 @@ function SignUp() {
   const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm({
-    mode: 'uncontrolled',
+    mode: "uncontrolled",
     initialValues: {
       email: "",
       password: "",
     },
 
     validate: {
-      email: (value) => (/^\S+@\S+$/.test(value) ? null : 'Invalid email'),
+      email: (value) => (/^\S+@\S+$/.test(value) ? null : "Invalid email"),
     },
   });
 
@@ -41,7 +41,7 @@ function SignUp() {
 
       setSuccess(true);
 
-      const text = response.body ? await response.text() : '';
+      const text = response.body ? await response.text() : "";
       console.log(text);
 
     } catch (error) {
@@ -65,15 +65,15 @@ function SignUp() {
         <TextInput
           label="Email Address"
           placeholder=""
-          key={form.key('email')}
-          {...form.getInputProps('email')}
+          key={form.key("email")}
+          {...form.getInputProps("email")}
         />
 
         <PasswordInput
           label="Password"
           placeholder=""
-          key={form.key('password')}
-          {...form.getInputProps('password')}
+          key={form.key("password")}
+          {...form.getInputProps("password")}
         />
 
         <Group justify="flex-end" mt="md">

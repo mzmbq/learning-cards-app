@@ -1,9 +1,9 @@
-import { TextInput, Button, Group, Box, PasswordInput, LoadingOverlay, Modal } from '@mantine/core';
-import { useForm } from '@mantine/form';
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { TextInput, Button, Group, Box, PasswordInput, LoadingOverlay, Modal } from "@mantine/core";
+import { useForm } from "@mantine/form";
+import { useState } from "react";
+import { Link } from "react-router-dom";
 
-import CONFIG from '../config';
+import CONFIG from "../config";
 
 type LoginFormValues = {
   email: string;
@@ -16,20 +16,21 @@ function Login() {
   const [success, setSuccess] = useState(false);
 
   const form = useForm({
-    mode: 'uncontrolled',
+    mode: "uncontrolled",
     initialValues: {
       email: "",
       password: "",
     },
 
     validate: {
-      email: (value) => (/^\S+@\S+$/.test(value) ? null : 'Invalid email'),
-      password: (value) => (value.length >= 0 ? null : 'Password is too short'),
+      email: (value) => (/^\S+@\S+$/.test(value) ? null : "Invalid email"),
+      password: (value) => (value.length >= 0 ? null : "Password is too short"),
     },
   });
 
   const doAuth = async (values: LoginFormValues) => {
     try {
+      setLoading(true);
       const response = await fetch(`${CONFIG.backendURL}/api/user/auth`, {
         method: "POST",
         body: JSON.stringify(values),
@@ -64,15 +65,15 @@ function Login() {
         <TextInput
           label="Email Address"
           placeholder=""
-          key={form.key('email')}
-          {...form.getInputProps('email')}
+          key={form.key("email")}
+          {...form.getInputProps("email")}
         />
 
         <PasswordInput
           label="Password"
           placeholder=""
-          key={form.key('password')}
-          {...form.getInputProps('password')}
+          key={form.key("password")}
+          {...form.getInputProps("password")}
         />
 
         <Group justify="flex-end" mt="md">
@@ -80,7 +81,7 @@ function Login() {
         </Group>
       </form>
 
-      <p>Don't have an account? <Link to="/signup">Create an account</Link></p>
+      <p>Don"t have an account? <Link to="/signup">Create an account</Link></p>
 
       {success && <p>Success!</p>}
     </Box>

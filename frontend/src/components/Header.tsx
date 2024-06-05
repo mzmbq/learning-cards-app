@@ -3,9 +3,9 @@ import {
   Group,
   Button,
   Box,
-} from '@mantine/core';
-import classes from './Header.module.css';
-import { Link, redirect } from 'react-router-dom';
+} from "@mantine/core";
+import classes from "./Header.module.css";
+import { Link, redirect } from "react-router-dom";
 
 export function Header() {
 
