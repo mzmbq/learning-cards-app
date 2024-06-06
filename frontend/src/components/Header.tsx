@@ -3,11 +3,14 @@ import {
   Group,
   Button,
   Box,
+  useMantineColorScheme,
 } from "@mantine/core";
 import classes from "./Header.module.css";
 import { Link, redirect } from "react-router-dom";
 
 export function Header() {
+
+  const { toggleColorScheme } = useMantineColorScheme();
 
   return (
     <Box pb={30}>
@@ -43,6 +46,7 @@ export function Header() {
             <Link to="/signup">
               <Button>Sign up</Button>
             </Link>
+            <Button onClick={() => toggleColorScheme()}>Dark/Light</Button>
           </Group>
 
         </Group>

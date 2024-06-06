@@ -70,7 +70,7 @@ const root = ReactDOM.createRoot(
 
 root.render(
   <React.StrictMode>
-    <MantineProvider theme={theme}>
+    <MantineProvider defaultColorScheme="auto" theme={theme}>
       <RouterProvider router={router} />
     </MantineProvider>
   </React.StrictMode >
