@@ -18,6 +18,7 @@ import Login from './components/Login';
 import SignUp from './components/SignUp';
 import ErrorPage from './components/ErrorPage';
 import StudyPage from './components/StudyPage';
+import NewCard from './components/NewCard';
 
 const router = createBrowserRouter([
   {
@@ -47,6 +48,10 @@ const router = createBrowserRouter([
       {
         path: "/study",
         element: <StudyPage />,
+      },
+      {
+        path: "/new-card",
+        element: <NewCard />,
       }
     ],
   },
