@@ -7,7 +7,7 @@ import {
   RouterProvider,
 } from "react-router-dom";
 
-import { MantineProvider } from '@mantine/core';
+import { createTheme, MantineProvider } from '@mantine/core';
 import '@mantine/core/styles.css';
 
 import App from './components/App';
@@ -52,6 +52,12 @@ const router = createBrowserRouter([
   },
 ])
 
+const theme = createTheme({
+  spacing: {
+    xs: '0.3rem',
+  },
+});
+
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -59,7 +65,7 @@ const root = ReactDOM.createRoot(
 
 root.render(
   <React.StrictMode>
-    <MantineProvider>
+    <MantineProvider theme={theme}>
       <RouterProvider router={router} />
     </MantineProvider>
   </React.StrictMode >

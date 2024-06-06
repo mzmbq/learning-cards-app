@@ -1,43 +1,39 @@
-import { Box, Container, LoadingOverlay } from "@mantine/core";
+import { Button, Container, LoadingOverlay } from "@mantine/core";
 import { useEffect, useState } from "react";
-import CONFIG from "../config";
 
+import classes from "./StudyPage.module.css"
 
+const frontText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+const backText = frontText;
 
 function StudyPage() {
   const [loading, setLoading] = useState(false);
-  const [data, setData] = useState<any>(null);
+  const [backVisible, setbackVisible] = useState(false);
+  const [front, setFront] = useState(frontText);
+  const [back, setBack] = useState(backText);
 
-  const fetchUser = async () => {
-    try {
-
-      const response = await fetch(`${CONFIG.backendURL}/api/user/whoami`, {
-        method: "GET",
-        credentials: "include"
-      })
-
-      if (!response.ok) {
-        throw new Error("lala")
-      }
-
-      setData(await response.json())
-
-    } catch (error: any) {
-      console.log(error)
-    }
-  }
-
-  useEffect(() => { fetchUser(); }, [])
 
   return (
     <Container>
       <LoadingOverlay visible={loading} />
 
-      <p>Study</p>
-      {JSON.stringify(data)}
+      <h2>Study</h2>
 
+      <div className={classes.cardContainer}>
 
-    </Container>
+        <div className={classes.cardFront}><p>{front}</p></div>
+        <div className={classes.cardBack}>{backVisible && <p>{back}</p>}</div>
+
+        <div className={classes.buttons}>
+          {!backVisible && <Button onClick={() => setbackVisible(true)}>Show Answwer</Button>}
+          {backVisible &&
+            <><Button color="green">Good</Button>
+              <Button>Ok</Button>
+              <Button color="red">Again</Button></>}
+        </div>
+      </div>
+
+    </Container >
   )
 }
 
