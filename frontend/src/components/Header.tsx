@@ -6,7 +6,7 @@ import {
   useMantineColorScheme,
 } from "@mantine/core";
 import classes from "./Header.module.css";
-import { Link, redirect } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 export function Header() {
 
@@ -18,7 +18,7 @@ export function Header() {
         <Group justify="space-between">
 
           <Group className={classes.logo}>
-            <img src="/logo.svg" />
+            <img alt="logo" src="/logo.svg" />
           </Group>
 
           <Group h="100%" gap={0}>

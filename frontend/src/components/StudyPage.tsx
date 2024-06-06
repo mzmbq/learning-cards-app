@@ -1,5 +1,5 @@
 import { Button, Container, LoadingOverlay } from "@mantine/core";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import classes from "./StudyPage.module.css"
 
