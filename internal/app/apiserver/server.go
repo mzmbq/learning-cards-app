@@ -154,6 +154,7 @@ func (s *server) handlerUserSignOut() http.HandlerFunc {
 		}
 
 		delete(session.Values, "userID")
+		delete(session.Values, "email")
 		session.Save(r, w)
 	}
 

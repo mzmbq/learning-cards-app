@@ -33,7 +33,7 @@ function SignUp() {
       const response = await fetch(`${CONFIG.backendURL}/api/user/create`, {
         method: "POST",
         body: JSON.stringify(values),
-      })
+      });
 
       if (!response.ok) {
         throw new Error("Sign up failed");
@@ -49,9 +49,9 @@ function SignUp() {
     } finally {
       setIsLoading(false);
     }
-  }
+  };
 
-  console.log(form.getInputProps("email"))
+  // console.log(form.getInputProps("email"))
 
   return (
     <Box maw={340} mx="auto">

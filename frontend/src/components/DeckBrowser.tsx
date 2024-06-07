@@ -24,7 +24,7 @@ function DeckBrowser() {
         </Group>
       </Table.Td>
     </Table.Tr>
-  ))
+  ));
 
   const fetchDecks = async () => {
     setLoading(true);
@@ -41,16 +41,16 @@ function DeckBrowser() {
 
     } catch (error: any) {
       console.error(error);
-      setError(error.message)
+      setError(error.message);
 
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     fetchDecks();
-  }, [])
+  }, []);
 
   if (error) {
     return <p style={{ color: "red" }}>Error: {error}</p>;

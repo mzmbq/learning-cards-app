@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 
 import CONFIG from "../config";
+import { useUserContext } from "../context/UserContext";
 
 type LoginFormValues = {
   email: string;
@@ -14,6 +15,8 @@ function Login() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+
+  const [user, setUser] = useUserContext();
 
   const form = useForm({
     mode: "uncontrolled",
@@ -42,6 +45,8 @@ function Login() {
         throw new Error("Login failed: " + errorText);
       }
 
+      setUser({ ...user, userName: values.email });
+
       setSuccess(true);
 
     } catch (error: any) {
@@ -50,15 +55,14 @@ function Login() {
     } finally {
       setLoading(false);
     }
-  }
-
+  };
 
   return (
     <Box maw={340} mx="auto">
       <LoadingOverlay visible={loading} />
 
       {error &&
-        <Modal opened={true} onClose={() => { setError(null) }} withCloseButton={true} title={error} />}
+        <Modal opened={true} onClose={() => { setError(null); }} withCloseButton={true} title={error} />}
 
       <h2>Log in to your account</h2>
       <form onSubmit={form.onSubmit((values) => doAuth(values))}>

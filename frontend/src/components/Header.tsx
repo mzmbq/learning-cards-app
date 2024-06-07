@@ -4,16 +4,59 @@ import {
   Button,
   Box,
   useMantineColorScheme,
+  LoadingOverlay,
 } from "@mantine/core";
 import classes from "./Header.module.css";
 import { Link } from "react-router-dom";
+import { useUserContext } from "../context/UserContext";
+import { useState } from "react";
+import CONFIG from "../config";
 
 export function Header() {
-
+  const [user] = useUserContext();
+  const [loading, setLoading] = useState(false);
   const { toggleColorScheme } = useMantineColorScheme();
+
+  const signOut = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(`${CONFIG.backendURL}/api/user/signout`, {
+        method: "GET",
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        let errorText = await response.text();
+        throw new Error("Signout failed: " + errorText);
+      }
+
+    } catch (error: any) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const buttonsLoginSignup = (<>
+    <Link to="/login">
+      <Button variant="default">Log in</Button>
+    </Link>
+    <Link to="/signup">
+      <Button>Sign up</Button>
+    </Link>
+  </>);
+
+  const userButtonSignout = (<>
+    <p>Signed in as <b>{user.userName}</b></p>
+    <Link to="/signup">
+      <Button onClick={() => signOut()}>Sign out</Button>
+    </Link>
+  </>);
 
   return (
     <Box pb={30}>
+      <LoadingOverlay visible={loading} />
+
       <header className={classes.header}>
         <Group justify="space-between">
 
@@ -40,12 +83,9 @@ export function Header() {
           </Group>
 
           <Group>
-            <Link to="/login">
-              <Button variant="default">Log in</Button>
-            </Link>
-            <Link to="/signup">
-              <Button>Sign up</Button>
-            </Link>
+            {
+              user.userName == "" ? buttonsLoginSignup : userButtonSignout
+            }
             <Button onClick={() => toggleColorScheme()}>Dark/Light</Button>
           </Group>
 
