@@ -13,9 +13,11 @@ import { useState } from "react";
 import CONFIG from "../config";
 
 export function Header() {
-  const [user] = useUserContext();
   const [loading, setLoading] = useState(false);
   const { toggleColorScheme } = useMantineColorScheme();
+
+  const [user, setUser] = useUserContext();
+
 
   const signOut = async () => {
     try {
@@ -29,6 +31,9 @@ export function Header() {
         let errorText = await response.text();
         throw new Error("Signout failed: " + errorText);
       }
+
+      setUser({ ...user, userName: "" });
+
 
     } catch (error: any) {
       console.error(error);
