@@ -190,9 +190,61 @@ func (s *server) handleWordDefine() http.HandlerFunc {
 	}
 }
 
+func (s *server) userFromRequest(r *http.Request) (*model.User, error) {
+	id := r.Context().Value(ctxKeyUserID)
+	if id == nil {
+		return nil, store.ErrRecordNotFound
+	}
+
+	idInt, ok := id.(int)
+	if !ok {
+		return nil, store.ErrRecordNotFound
+	}
+
+	u, err := s.store.User().Find(idInt)
+	if err != nil {
+		return nil, err
+	}
+
+	return u, nil
+}
+
 func (s *server) handleDeckCreate() http.HandlerFunc {
+	type request struct {
+		DeckName string `json:"deckname"`
+	}
+
+	type response struct {
+		DeckID int `json:"deckid"`
+	}
+
 	return func(w http.ResponseWriter, r *http.Request) {
-		http.Error(w, "", http.StatusNotImplemented)
+		u, err := s.userFromRequest(r)
+		if err != nil {
+			http.Error(w, "", http.StatusInternalServerError)
+			return
+		}
+
+		req := request{}
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			http.Error(w, "", http.StatusInternalServerError)
+			return
+		}
+
+		d := model.Deck{
+			Name:   req.DeckName,
+			UserID: u.ID,
+		}
+
+		if err = s.store.Deck().Create(&d); err != nil {
+			http.Error(w, "", http.StatusBadRequest)
+			return
+		}
+
+		res := response{
+			DeckID: d.ID,
+		}
+		s.WriteJSON(w, http.StatusOK, res)
 	}
 }
 
@@ -203,21 +255,39 @@ func (s *server) handleDecksList() http.HandlerFunc {
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
-		time.Sleep(500 * time.Millisecond)
+		// Mock data
+		// time.Sleep(500 * time.Millisecond)
 
-		res := response{
-			Decks: []model.Deck{},
+		// res := response{
+		// 	Decks: []model.Deck{},
+		// }
+
+		// for i := range 20 {
+		// 	res.Decks = append(res.Decks, model.Deck{
+		// 		ID:     i,
+		// 		Name:   fmt.Sprintf("Deck %d", i),
+		// 		UserID: 1,
+		// 	})
+		// }
+
+		// s.WriteJSON(w, http.StatusOK, res)
+
+		u, err := s.userFromRequest(r)
+		if err != nil {
+			http.Error(w, "", http.StatusInternalServerError)
+			return
 		}
 
-		for i := range 20 {
-			res.Decks = append(res.Decks, model.Deck{
-				ID:     i,
-				Name:   fmt.Sprintf("Deck %d", i),
-				UserID: 1,
-			})
+		decks, err := s.store.Deck().FindAllByUserID(u.ID)
+		if err != nil {
+			http.Error(w, "", http.StatusInternalServerError)
+			return
 		}
 
-		s.WriteJSON(w, 200, res)
+		res := &response{
+			Decks: decks,
+		}
+		s.WriteJSON(w, http.StatusOK, res)
 	}
 
 }

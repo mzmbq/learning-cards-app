@@ -11,6 +11,7 @@ type UserRepository interface {
 type DeckRepository interface {
 	Create(*model.Deck) error
 	Find(int) (*model.Deck, error)
+	FindAllByUserID(int) ([]model.Deck, error)
 }
 
 type CardRepository interface {

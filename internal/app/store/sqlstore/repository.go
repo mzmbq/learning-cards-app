@@ -100,6 +100,39 @@ func (r *DeckRepository) Find(id int) (*model.Deck, error) {
 	return d, nil
 }
 
+func (r *DeckRepository) FindAllByUserID(id int) ([]model.Deck, error) {
+	rows, err := r.store.db.Query("SELECT id, name, user_id FROM decks WHERE user_id = $1",
+		id,
+	)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, store.ErrRecordNotFound
+		}
+		return nil, err
+	}
+	defer rows.Close()
+
+	decks := make([]model.Deck, 0)
+	for rows.Next() {
+		d := model.Deck{}
+		err = rows.Scan(
+			&d.ID,
+			&d.Name,
+			&d.UserID,
+		)
+		if err != nil {
+			return nil, err
+		}
+		decks = append(decks, d)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return decks, nil
+}
+
 // Card
 
 type CardRepository struct {

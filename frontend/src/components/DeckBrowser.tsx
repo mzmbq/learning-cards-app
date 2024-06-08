@@ -30,13 +30,17 @@ function DeckBrowser() {
     setLoading(true);
 
     try {
-      const response = await fetch(`${CONFIG.backendURL}/api/decks`);
+      const response = await fetch(`${CONFIG.backendURL}/api/deck/list`, {
+        method: "GET",
+        credentials: "include",
+      });
 
       if (!response.ok) {
         throw new Error("Failed to fetch decks");
       }
 
       const data = await response.json();
+      console.log(data);
       setDecks(data.decks);
 
     } catch (error: any) {
