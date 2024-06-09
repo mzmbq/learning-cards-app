@@ -2,31 +2,35 @@ import { useEffect, useState } from "react";
 
 import CONFIG from "../config";
 import { Button, Container, LoadingOverlay, Table } from "@mantine/core";
+import { useParams } from "react-router-dom";
 
 type Card = {
   id: number;
   front: string;
   back: string;
   deck_id: number;
-}
+};
 
 function CardBrowser() {
   const [cards, setCards] = useState<Card[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  const deckID = useParams().id;
+
   const rows = cards.map((card: Card) => (
     <Table.Tr key={card.id}>
       <Table.Td>{card.front}</Table.Td>
       <Table.Td>{card.back}</Table.Td>
     </Table.Tr>
-  ))
+  ));
 
   const fetchCards = async () => {
+    console.log(deckID);
     setLoading(true);
 
     try {
-      const response = await fetch(`${CONFIG.backendURL}/api/deck/1`)
+      const response = await fetch(`${CONFIG.backendURL}/api/deck/list/1`);
 
       if (!response.ok) {
         throw new Error("Failed to fetch cards");
@@ -37,19 +41,19 @@ function CardBrowser() {
 
     } catch (error: any) {
       console.error(error);
-      setError(error.message)
+      setError(error.message);
 
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
     fetchCards();
-  }, [])
+  }, []);
 
   if (error) {
-    return <p style={{ color: "red" }}>Error: {error}</p>;
+    return <Container><h1 style={{ color: "red" }}>Error: {error}</h1></Container>;
   }
 
   return (
@@ -72,7 +76,7 @@ function CardBrowser() {
 
       <Button>Add</Button>
     </Container>
-  )
+  );
 }
 
 export default CardBrowser;

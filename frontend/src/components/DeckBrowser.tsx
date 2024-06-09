@@ -1,6 +1,7 @@
 import { Button, Container, Group, LoadingOverlay, Table, TextInput } from "@mantine/core";
 import { useEffect, useState } from "react";
 import CONFIG from "../config";
+import { useNavigate } from "react-router-dom";
 
 type Deck = {
   id: number;
@@ -18,14 +19,17 @@ function DeckBrowser() {
   const [loading, setLoading] = useState(false);
   const [formInput, setFormInput] = useState("");
 
+  const navigate = useNavigate();
+
   const rows = decks.map((d) => (
     <Table.Tr key={d.id}>
       <Table.Td>{d.name}</Table.Td>
       <Table.Td>
         <Group gap="xs">
-          <Button color="green">Study</Button>
-          <Button color="blue">Edit</Button>
-          <Button color="red">Delete</Button>
+          <Button disabled color="green">Study</Button>
+          <Button disabled color="blue">Rename</Button>
+          <Button color="blue" onClick={() => navigate(`/deck/${d.id}`)}>Edit</Button>
+          <Button color="red" onClick={() => deckDelete(d.id)}>Delete</Button>
         </Group>
       </Table.Td>
     </Table.Tr>
@@ -35,18 +39,23 @@ function DeckBrowser() {
     setLoading(true);
 
     try {
-      const response = await fetch(`${CONFIG.backendURL}/api/deck/list`, {
+      const response = await fetch(`${CONFIG.backendURL}/api/decks/list`, {
         method: "GET",
         credentials: "include",
       });
+
       if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error("Unauthorized");
+        }
         throw new Error("Failed to fetch decks");
+
       }
       const data = await response.json();
-      console.log(data);
       setDecks(data.decks);
 
     } catch (error: any) {
+
       console.error(error);
       setError(error.message);
 
@@ -55,7 +64,7 @@ function DeckBrowser() {
     }
   };
 
-  const createNewDeck = async () => {
+  const deckCreate = async () => {
     setLoading(true);
 
     try {
@@ -68,6 +77,7 @@ function DeckBrowser() {
         body: JSON.stringify(body),
         credentials: "include",
       });
+
       if (!response.ok) {
         throw new Error(`Failed to create a deck ${formInput}`);
       }
@@ -82,12 +92,36 @@ function DeckBrowser() {
     }
   };
 
+  const deckDelete = async (id: number) => {
+    setLoading(true);
+
+    try {
+      const response = await fetch(`${CONFIG.backendURL}/api/deck/delete/${id}`, {
+        method: "GET",
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to delete a deck. id: ${id}`);
+      }
+      await fetchDecks();
+
+    } catch (error: any) {
+      console.error(error);
+      setError(error.message);
+
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
   useEffect(() => {
     fetchDecks();
   }, []);
 
   if (error) {
-    return <p style={{ color: "red" }}>Error: {error}</p>;
+    return <Container><h1 style={{ color: "red" }}>Error: {error}</h1></Container>;
   }
 
   return (
@@ -119,7 +153,7 @@ function DeckBrowser() {
             <Table.Td>
               <Button
                 type="submit"
-                onClick={() => createNewDeck()}>
+                onClick={() => deckCreate()}>
                 Create
               </Button>
 

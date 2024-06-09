@@ -2,6 +2,7 @@ package sqlstore
 
 import (
 	"database/sql"
+	"log"
 
 	"github.com/mzmbq/learning-cards-app/backend/internal/app/model"
 	"github.com/mzmbq/learning-cards-app/backend/internal/app/store"
@@ -131,6 +132,42 @@ func (r *DeckRepository) FindAllByUserID(id int) ([]model.Deck, error) {
 	}
 
 	return decks, nil
+}
+
+func (r *DeckRepository) Delete(id int) error {
+	// delete deck
+	stmt, err := r.store.db.Prepare("DELETE FROM decks WHERE id = $1")
+	if err != nil {
+		return err
+	}
+	res, err := stmt.Exec(id)
+	if err != nil {
+		return err
+	}
+	count, err := res.RowsAffected()
+	if err != nil {
+		log.Println("rowsAffected not supported by driver")
+	} else {
+		log.Printf("repository: removed %d deck(s)\n", count)
+	}
+
+	// delete cards
+	stmt, err = r.store.db.Prepare("DELETE FROM cards WHERE deck_id = $1")
+	if err != nil {
+		return err
+	}
+	res, err = stmt.Exec(id)
+	if err != nil {
+		return err
+	}
+	count, err = res.RowsAffected()
+	if err != nil {
+		log.Println("rowsAffected not supported by driver")
+	} else {
+		log.Printf("repository: removed %d card(s)\n", count)
+	}
+
+	return nil
 }
 
 // Card

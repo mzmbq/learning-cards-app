@@ -1,6 +1,6 @@
 import { TextInput, Button, Group, Box, PasswordInput, LoadingOverlay } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import CONFIG from "../config";
 import { useState } from "react";
@@ -13,6 +13,8 @@ type SignUpFormValues = {
 function SignUp() {
   const [success, setSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
+  const navigate = useNavigate();
 
   const form = useForm({
     mode: "uncontrolled",
@@ -41,8 +43,7 @@ function SignUp() {
 
       setSuccess(true);
 
-      const text = response.body ? await response.text() : "";
-      console.log(text);
+      navigate("/decks");
 
     } catch (error) {
       console.error(error);

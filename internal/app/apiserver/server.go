@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gorilla/sessions"
@@ -248,6 +249,53 @@ func (s *server) handleDeckCreate() http.HandlerFunc {
 	}
 }
 
+func (s *server) handleDeckDelete() http.HandlerFunc {
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		u, err := s.userFromRequest(r)
+		if err != nil {
+			http.Error(w, "", http.StatusInternalServerError)
+			log.Println(err)
+			return
+		}
+
+		idStr := r.PathValue("id")
+		if idStr == "" {
+			http.Error(w, "no deck with id: "+idStr, http.StatusInternalServerError)
+			log.Println(err)
+			return
+		}
+
+		id, err := strconv.Atoi(idStr)
+		if err != nil {
+			http.Error(w, "invalid deck id", http.StatusBadRequest)
+			log.Println(err)
+			return
+		}
+
+		d, err := s.store.Deck().Find(id)
+		if err != nil {
+			http.Error(w, "", http.StatusBadRequest)
+			log.Println(err)
+			return
+		}
+		if d.UserID != u.ID {
+			http.Error(w, "", http.StatusUnauthorized)
+			log.Println(err)
+			return
+		}
+
+		err = s.store.Deck().Delete(id)
+		if err != nil {
+			http.Error(w, "", http.StatusInternalServerError)
+			log.Println(err)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+	}
+}
+
 func (s *server) handleDecksList() http.HandlerFunc {
 
 	type response struct {
@@ -255,23 +303,6 @@ func (s *server) handleDecksList() http.HandlerFunc {
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
-		// Mock data
-		// time.Sleep(500 * time.Millisecond)
-
-		// res := response{
-		// 	Decks: []model.Deck{},
-		// }
-
-		// for i := range 20 {
-		// 	res.Decks = append(res.Decks, model.Deck{
-		// 		ID:     i,
-		// 		Name:   fmt.Sprintf("Deck %d", i),
-		// 		UserID: 1,
-		// 	})
-		// }
-
-		// s.WriteJSON(w, http.StatusOK, res)
-
 		u, err := s.userFromRequest(r)
 		if err != nil {
 			http.Error(w, "", http.StatusInternalServerError)
@@ -292,7 +323,7 @@ func (s *server) handleDecksList() http.HandlerFunc {
 
 }
 
-func (s *server) handleDeckGet() http.HandlerFunc {
+func (s *server) handleDeckList() http.HandlerFunc {
 
 	type response struct {
 		Cards []model.Card `json:"cards"`

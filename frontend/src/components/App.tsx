@@ -42,7 +42,7 @@ const router = createBrowserRouter([
         element: <DeckBrowser />,
       },
       {
-        path: "/cards",
+        path: "/deck/:id",
         element: <CardBrowser />,
       },
       {
