@@ -1,7 +1,11 @@
+import { Container } from "@mantine/core";
+
 function ErrorPage() {
   return (
-    <h1>Page not found</h1>
-  )
+    <Container>
+      <h1>Page not found</h1>
+    </Container>
+  );
 }
 
 export default ErrorPage;

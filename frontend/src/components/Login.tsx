@@ -1,7 +1,7 @@
 import { TextInput, Button, Group, Box, PasswordInput, LoadingOverlay, Modal } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import CONFIG from "../config";
 import { useUserContext } from "../context/UserContext";
@@ -17,6 +17,7 @@ function Login() {
   const [success, setSuccess] = useState(false);
 
   const [user, setUser] = useUserContext();
+  const navigate = useNavigate();
 
   const form = useForm({
     mode: "uncontrolled",
@@ -48,6 +49,7 @@ function Login() {
       setUser({ ...user, userName: values.email });
 
       setSuccess(true);
+      navigate("/decks");
 
     } catch (error: any) {
       console.error(error);

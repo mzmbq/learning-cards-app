@@ -53,7 +53,7 @@ export function Header() {
 
   const userButtonSignout = (<>
     <p>Signed in as <b>{user.userName}</b></p>
-    <Link to="/signup">
+    <Link to="/login">
       <Button onClick={() => signOut()}>Sign out</Button>
     </Link>
   </>);
@@ -89,7 +89,7 @@ export function Header() {
 
           <Group>
             {
-              user.userName == "" ? buttonsLoginSignup : userButtonSignout
+              user.userName === "" ? buttonsLoginSignup : userButtonSignout
             }
             <Button onClick={() => toggleColorScheme()}>Dark/Light</Button>
           </Group>
