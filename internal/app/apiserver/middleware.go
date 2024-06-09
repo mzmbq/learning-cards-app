@@ -49,6 +49,7 @@ func (s *server) withCORS(h http.Handler) http.Handler {
 		origin := r.Header.Get("Origin")
 		if origin == "" {
 			h.ServeHTTP(w, r)
+			return
 		}
 
 		for _, o := range s.corsOrigins {
