@@ -206,3 +206,38 @@ func (r *CardRepository) Find(id int) (*model.Card, error) {
 
 	return c, nil
 }
+
+func (r *CardRepository) FindAllByDeckID(id int) ([]model.Card, error) {
+	rows, err := r.store.db.Query(
+		"SELECT id, front, back, deck_id FROM cards WHERE deck_id = $1",
+		id,
+	)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, store.ErrRecordNotFound
+		}
+		return nil, err
+	}
+	defer rows.Close()
+
+	cards := make([]model.Card, 0)
+	for rows.Next() {
+		card := model.Card{}
+		err = rows.Scan(
+			&card.ID,
+			&card.Front,
+			&card.Back,
+			&card.DeckID,
+		)
+		if err != nil {
+			return nil, err
+		}
+		cards = append(cards, card)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return cards, nil
+}

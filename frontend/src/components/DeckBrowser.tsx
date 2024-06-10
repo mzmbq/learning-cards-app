@@ -3,11 +3,7 @@ import { useEffect, useState } from "react";
 import CONFIG from "../config";
 import { useNavigate } from "react-router-dom";
 
-type Deck = {
-  id: number;
-  name: string;
-  user_id: number;
-};
+import { Deck } from "../types";
 
 type DeckCreateReqBody = {
   deckName: string;
@@ -28,7 +24,7 @@ function DeckBrowser() {
         <Group gap="xs">
           <Button disabled color="green">Study</Button>
           <Button disabled color="blue">Rename</Button>
-          <Button color="blue" onClick={() => navigate(`/deck/${d.id}`)}>Edit</Button>
+          <Button color="blue" onClick={() => navigate(`/deck/${d.id}`)}>View</Button>
           <Button color="red" onClick={() => deckDelete(d.id)}>Delete</Button>
         </Group>
       </Table.Td>
@@ -133,8 +129,8 @@ function DeckBrowser() {
       <Table striped highlightOnHover withTableBorder>
         <Table.Thead>
           <Table.Tr>
-            <Table.Th>Table</Table.Th>
-            <Table.Th>Actions</Table.Th>
+            <Table.Th>Deck</Table.Th>
+            <Table.Th></Table.Th>
           </Table.Tr>
         </Table.Thead>
 

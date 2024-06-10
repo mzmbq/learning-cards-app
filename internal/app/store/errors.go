@@ -3,5 +3,5 @@ package store
 import "errors"
 
 var (
-	ErrRecordNotFound = errors.New("reconrd not found")
+	ErrRecordNotFound = errors.New("record not found")
 )

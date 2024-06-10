@@ -2,7 +2,9 @@ import { useEffect, useState } from "react";
 
 import CONFIG from "../config";
 import { Button, Container, LoadingOverlay, Table } from "@mantine/core";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+
+import classes from "./CardBrowser.module.css";
 
 type Card = {
   id: number;
@@ -16,7 +18,9 @@ function CardBrowser() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const deckID = useParams().id;
+  const navigate = useNavigate();
+
+  const deckID = Number(useParams().id);
 
   const rows = cards.map((card: Card) => (
     <Table.Tr key={card.id}>
@@ -25,15 +29,21 @@ function CardBrowser() {
     </Table.Tr>
   ));
 
-  const fetchCards = async () => {
-    console.log(deckID);
+  const fetchCards = async (deckID: number) => {
     setLoading(true);
 
     try {
-      const response = await fetch(`${CONFIG.backendURL}/api/deck/list/1`);
+      if (isNaN(deckID)) {
+        throw new Error("invalid deck id");
+      }
+
+      const response = await fetch(`${CONFIG.backendURL}/api/deck/list/${deckID}`, {
+        method: "GET",
+        credentials: "include",
+      });
 
       if (!response.ok) {
-        throw new Error("Failed to fetch cards");
+        throw new Error("failed to fetch cards");
       }
 
       const data = await response.json();
@@ -49,7 +59,7 @@ function CardBrowser() {
   };
 
   useEffect(() => {
-    fetchCards();
+    fetchCards(deckID);
   }, []);
 
   if (error) {
@@ -62,19 +72,24 @@ function CardBrowser() {
 
       <h2>Cards</h2>
 
-      <Table striped highlightOnHover withTableBorder>
-        <Table.Thead>
-          <Table.Tr>
-            <Table.Th>Front</Table.Th>
-            <Table.Th>Back</Table.Th>
-          </Table.Tr>
-        </Table.Thead>
-        <Table.Tbody>
-          {rows}
-        </Table.Tbody>
-      </Table>
+      <div className={classes.outerContainer}>
+        <Table striped highlightOnHover withTableBorder>
+          <Table.Thead>
+            <Table.Tr>
+              <Table.Th>Front</Table.Th>
+              <Table.Th>Back</Table.Th>
+            </Table.Tr>
+          </Table.Thead>
+          <Table.Tbody>
+            {rows}
+          </Table.Tbody>
+        </Table>
 
-      <Button>Add</Button>
+        <div className={classes.buttons}>
+          <Button onClick={() => { navigate(`/new-card/${deckID}`); }}>Add</Button>
+        </div>
+      </div>
+
     </Container>
   );
 }

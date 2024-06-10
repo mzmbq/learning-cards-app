@@ -6,7 +6,6 @@ import (
 	"log"
 	"net/http"
 	"strconv"
-	"time"
 
 	"github.com/gorilla/sessions"
 
@@ -122,6 +121,7 @@ func (s *server) handleUserAuth() http.HandlerFunc {
 		u, err := s.store.User().FindByEmail(req.Email)
 		if err != nil || !u.CheckPassword(req.Password) {
 			http.Error(w, "email or password incorrect", http.StatusUnauthorized)
+			log.Println(err)
 			return
 		}
 
@@ -275,7 +275,7 @@ func (s *server) handleDeckDelete() http.HandlerFunc {
 
 		d, err := s.store.Deck().Find(id)
 		if err != nil {
-			http.Error(w, "", http.StatusBadRequest)
+			http.Error(w, "", http.StatusUnauthorized)
 			log.Println(err)
 			return
 		}
@@ -297,7 +297,6 @@ func (s *server) handleDeckDelete() http.HandlerFunc {
 }
 
 func (s *server) handleDecksList() http.HandlerFunc {
-
 	type response struct {
 		Decks []model.Deck `json:"decks"`
 	}
@@ -324,21 +323,52 @@ func (s *server) handleDecksList() http.HandlerFunc {
 }
 
 func (s *server) handleDeckList() http.HandlerFunc {
-
 	type response struct {
 		Cards []model.Card `json:"cards"`
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
-		time.Sleep(500 * time.Millisecond)
+		u, err := s.userFromRequest(r)
+		if err != nil {
+			http.Error(w, "", http.StatusInternalServerError)
+			log.Println(err)
+			return
+		}
 
-		s.WriteJSON(w, 200, response{Cards: []model.Card{
-			{ID: 1, DeckID: 1, Front: "Front 1", Back: "Back 1"},
-			{ID: 2, DeckID: 1, Front: "Front 2", Back: "Back 2"},
-			{ID: 3, DeckID: 1, Front: "Front 3", Back: "Back 3"},
-			{ID: 4, DeckID: 1, Front: "Front 4", Back: "Back 4"},
-			{ID: 5, DeckID: 1, Front: "Front 5", Back: "Back 5"},
-		}})
+		idStr := r.PathValue("id")
+		if idStr == "" {
+			http.Error(w, "no deck with id: "+idStr, http.StatusInternalServerError)
+			log.Println(err)
+			return
+		}
+
+		id, err := strconv.Atoi(idStr)
+		if err != nil {
+			http.Error(w, "invalid deck id", http.StatusBadRequest)
+			log.Println(err)
+			return
+		}
+
+		d, err := s.store.Deck().Find(id)
+		if err != nil {
+			http.Error(w, "", http.StatusUnauthorized)
+			log.Println(err)
+			return
+		}
+		if d.UserID != u.ID {
+			http.Error(w, "", http.StatusUnauthorized)
+			log.Println(err)
+			return
+		}
+
+		cards, err := s.store.Card().FindAllByDeckID(id)
+		if err != nil {
+			http.Error(w, "", http.StatusInternalServerError)
+			log.Println(err)
+			return
+		}
+
+		s.WriteJSON(w, http.StatusOK, response{Cards: cards})
 	}
 }
 
