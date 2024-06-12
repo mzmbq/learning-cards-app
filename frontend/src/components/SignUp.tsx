@@ -1,4 +1,4 @@
-import { TextInput, Button, Group, Box, PasswordInput, LoadingOverlay } from "@mantine/core";
+import { TextInput, Button, Group, Box, PasswordInput, LoadingOverlay, Modal } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -11,7 +11,7 @@ type SignUpFormValues = {
 };
 
 function SignUp() {
-  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
@@ -38,15 +38,18 @@ function SignUp() {
       });
 
       if (!response.ok) {
+        if (response.status === 409) {
+          throw new Error("A user with this email already exists");
+        }
         throw new Error("Sign up failed");
       }
 
-      setSuccess(true);
 
       navigate("/decks");
 
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
+      setError(error.message);
     } finally {
       setIsLoading(false);
     }
@@ -58,7 +61,9 @@ function SignUp() {
     <Box maw={340} mx="auto">
       <LoadingOverlay visible={isLoading} />
 
-      {success && <p>Success!</p>}
+      {error &&
+        <Modal opened={true} onClose={() => { setError(null); }} withCloseButton={true} title={error} />}
+
 
       <h2>Create an account</h2>
 
