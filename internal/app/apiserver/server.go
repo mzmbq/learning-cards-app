@@ -72,6 +72,7 @@ func (s *server) handleUserCreate() http.HandlerFunc {
 		req := request{}
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			http.Error(w, "invalid json payload", http.StatusBadRequest)
+			log.Println(err)
 			return
 		}
 
@@ -80,8 +81,20 @@ func (s *server) handleUserCreate() http.HandlerFunc {
 			Password: req.Password,
 		}
 
+		uFound, err := s.store.User().FindByEmail(req.Email)
+		if err != nil && err != store.ErrRecordNotFound {
+			http.Error(w, "", http.StatusInternalServerError)
+			log.Println(err)
+			return
+		}
+		if uFound != nil {
+			http.Error(w, "a user with this email already exists", http.StatusConflict)
+			return
+		}
+
 		if err := s.store.User().Create(&u); err != nil {
 			http.Error(w, "create user failed", http.StatusInternalServerError)
+			log.Println(err)
 			return
 		}
 
