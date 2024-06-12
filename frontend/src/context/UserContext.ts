@@ -4,9 +4,11 @@ export type User = {
   userName: string;
 };
 
-export const UserContext = createContext<
-  [User, Dispatch<SetStateAction<User>>] | undefined
->(undefined);
+type UserContextState = [user: User, setUser: Dispatch<SetStateAction<User>>];
+
+export const UserContext = createContext<UserContextState | undefined>(
+  undefined
+);
 
 // export const UserContext = createContext<any>(undefined);
 
