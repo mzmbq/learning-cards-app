@@ -4,6 +4,7 @@ import CONFIG from "../config";
 import { useNavigate } from "react-router-dom";
 
 import { Deck } from "../types";
+import ErrorPage from "./ErrorPage";
 
 type DeckCreateReqBody = {
   deckName: string;
@@ -117,7 +118,7 @@ function DeckBrowser() {
   }, []);
 
   if (error) {
-    return <Container><h1 style={{ color: "red" }}>Error: {error}</h1></Container>;
+    return <ErrorPage message={error} />;
   }
 
   return (

@@ -5,6 +5,7 @@ import { Button, Container, LoadingOverlay, Table } from "@mantine/core";
 import { useNavigate, useParams } from "react-router-dom";
 
 import classes from "./CardBrowser.module.css";
+import ErrorPage from "./ErrorPage";
 
 type Card = {
   id: number;
@@ -63,7 +64,7 @@ function CardBrowser() {
   }, []);
 
   if (error) {
-    return <Container><h1 style={{ color: "red" }}>Error: {error}</h1></Container>;
+    return <ErrorPage message={error} />;
   }
 
   return (
