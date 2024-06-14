@@ -26,7 +26,7 @@ function DeckBrowser() {
           <Button disabled color="green">Study</Button>
           <Button disabled color="blue">Rename</Button>
           <Button color="blue" onClick={() => navigate(`/deck/${d.id}`)}>View</Button>
-          <Button color="red" onClick={() => deckDelete(d.id)}>Delete</Button>
+          <Button color="red" onClick={() => deckDelete(d.id!)}>Delete</Button>
         </Group>
       </Table.Td>
     </Table.Tr>

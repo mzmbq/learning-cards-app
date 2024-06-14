@@ -241,3 +241,15 @@ func (r *CardRepository) FindAllByDeckID(id int) ([]model.Card, error) {
 
 	return cards, nil
 }
+
+// ? move somewhere else
+func (r *CardRepository) BelongsToUser(c *model.Card, userID int) bool {
+	d, err := r.store.Deck().Find(c.DeckID)
+	if err != nil {
+		return false
+	}
+	if d.UserID != userID {
+		return false
+	}
+	return true
+}

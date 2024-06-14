@@ -12,7 +12,7 @@ import DeckBrowser from './DeckBrowser';
 import Header from './Header';
 import Login from './Login';
 import SignUp from './SignUp';
-import ErrorPage from './ErrorPage';
+import NotFoundPage from './NotFoundPage';
 import StudyPage from './StudyPage';
 import NewCard from './NewCard';
 import { User, UserContext } from '../context/UserContext';
@@ -23,7 +23,7 @@ import CONFIG from "../config";
 const router = createBrowserRouter([
   {
     element: <><Header /><Outlet /></>,
-    errorElement: <><Header /><ErrorPage /></>,
+    errorElement: <><Header /><NotFoundPage /></>,
     children: [
       {
         path: "/",
@@ -50,7 +50,7 @@ const router = createBrowserRouter([
         element: <StudyPage />,
       },
       {
-        path: "/new-card",
+        path: "/new-card/:id",
         element: <NewCard />,
       }
     ],

@@ -19,4 +19,5 @@ type CardRepository interface {
 	Create(*model.Card) error
 	Find(int) (*model.Card, error)
 	FindAllByDeckID(int) ([]model.Card, error)
+	BelongsToUser(*model.Card, int) bool
 }

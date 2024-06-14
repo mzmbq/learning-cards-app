@@ -78,9 +78,9 @@ export function Header() {
               My Decks
             </Link>
 
-            <Link to="/new-card" className={classes.link}>
+            {/* <Link to="/new-card" className={classes.link}>
               New Card
-            </Link>
+            </Link> */}
           </Group>
 
           <Group>

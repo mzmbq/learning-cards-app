@@ -38,7 +38,7 @@ function CardBrowser() {
         throw new Error("invalid deck id");
       }
 
-      const response = await fetch(`${CONFIG.backendURL}/api/deck/list/${deckID}`, {
+      const response = await fetch(`${CONFIG.backendURL}/api/deck/list-cards/${deckID}`, {
         method: "GET",
         credentials: "include",
       });
