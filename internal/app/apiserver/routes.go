@@ -16,6 +16,6 @@ func (s *server) routes() {
 
 	s.mux.Handle("POST /api/card/create", s.withAuth(s.handleCardCreate()))
 	s.mux.Handle("POST /api/card/update/{id}", s.withAuth(s.handleCardUpdate()))
-	s.mux.Handle("POST /api/card/delete/{id}", s.withAuth(s.handleCardDelete()))
+	s.mux.Handle("GET /api/card/delete/{id}", s.withAuth(s.handleCardDelete()))
 
 }

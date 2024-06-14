@@ -10,14 +10,18 @@ type UserRepository interface {
 
 type DeckRepository interface {
 	Create(*model.Deck) error
-	Find(int) (*model.Deck, error)
-	FindAllByUserID(int) ([]model.Deck, error)
-	Delete(int) error
+	Update(*model.Deck) error
+	Delete(id int) error
+	Find(id int) (*model.Deck, error)
+	FindAllByUserID(userID int) ([]model.Deck, error)
+	BelongsToUser(deckID int, userID int) bool
 }
 
 type CardRepository interface {
 	Create(*model.Card) error
-	Find(int) (*model.Card, error)
+	Update(*model.Card) error
+	Delete(id int) error
+	Find(id int) (*model.Card, error)
 	FindAllByDeckID(int) ([]model.Card, error)
-	BelongsToUser(*model.Card, int) bool
+	BelongsToUser(cardID int, userID int) bool
 }

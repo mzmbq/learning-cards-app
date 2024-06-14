@@ -170,6 +170,22 @@ func (r *DeckRepository) Delete(id int) error {
 	return nil
 }
 
+func (r *DeckRepository) Update(deck *model.Deck) error {
+
+	return nil
+}
+
+func (r *DeckRepository) BelongsToUser(deckID int, userID int) bool {
+	d, err := r.store.Deck().Find(deckID)
+	if err != nil {
+		return false
+	}
+	if d.UserID != userID {
+		return false
+	}
+	return true
+}
+
 // Card
 
 type CardRepository struct {
@@ -242,14 +258,55 @@ func (r *CardRepository) FindAllByDeckID(id int) ([]model.Card, error) {
 	return cards, nil
 }
 
-// ? move somewhere else
-func (r *CardRepository) BelongsToUser(c *model.Card, userID int) bool {
-	d, err := r.store.Deck().Find(c.DeckID)
+func (r *CardRepository) Update(c *model.Card) error {
+	err := r.store.db.QueryRow(
+		"UPDATE cards SET (front, back, deck_id) = ($1, $2, $3) WHERE id = $4",
+		c.Front,
+		c.Back,
+		c.DeckID,
+		c.ID,
+	).Err()
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *CardRepository) Delete(id int) error {
+	err := r.store.db.QueryRow("DELETE FROM cards WHERE id = $1", id).Err()
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return store.ErrRecordNotFound
+		}
+		return err
+	}
+
+	return nil
+}
+
+// ? use SQL query
+func (r *CardRepository) BelongsToUser(cardID int, userID int) bool {
+	decks, err := r.store.Deck().FindAllByUserID(userID)
+	if err != nil || len(decks) == 0 {
+		return false
+	}
+
+	log.Println(decks)
+
+	card, err := r.store.Card().Find(cardID)
 	if err != nil {
 		return false
 	}
-	if d.UserID != userID {
-		return false
+
+	log.Println(card)
+
+	for _, deck := range decks {
+		if card.DeckID == deck.ID {
+			return true
+		}
 	}
-	return true
+
+	return false
 }
