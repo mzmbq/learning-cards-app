@@ -49,21 +49,6 @@ func (s *server) handleUserCreate() http.HandlerFunc {
 	}
 }
 
-func (s *server) handleUserFind() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		email := r.PathValue("email")
-
-		u, err := s.store.User().FindByEmail(email)
-		if err != nil {
-			http.Error(w, "user not found", http.StatusNotFound)
-			return
-		}
-
-		s.WriteJSON(w, http.StatusOK, u)
-
-	}
-}
-
 func (s *server) handleUserAuth() http.HandlerFunc {
 	type request struct {
 		Email    string `json:"email"`

@@ -70,17 +70,3 @@ func (s *server) userFromRequest(r *http.Request) (*model.User, error) {
 
 	return u, nil
 }
-
-// Handlers
-
-func (s *server) handleCardLearn() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		http.Error(w, "", http.StatusNotImplemented)
-	}
-}
-
-func (s *server) handleWordDefine() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		http.Error(w, "", http.StatusNotImplemented)
-	}
-}
