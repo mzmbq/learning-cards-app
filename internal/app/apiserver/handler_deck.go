@@ -13,7 +13,6 @@ func (s *server) handleDeckCreate() http.HandlerFunc {
 	type request struct {
 		DeckName string `json:"deckname"`
 	}
-
 	type response struct {
 		DeckID int `json:"deck_id"`
 	}
@@ -49,7 +48,6 @@ func (s *server) handleDeckCreate() http.HandlerFunc {
 }
 
 func (s *server) handleDeckDelete() http.HandlerFunc {
-
 	return func(w http.ResponseWriter, r *http.Request) {
 		u, err := s.userFromRequest(r)
 		if err != nil {
@@ -90,7 +88,6 @@ func (s *server) handleDeckDelete() http.HandlerFunc {
 			log.Println(err)
 			return
 		}
-
 		w.WriteHeader(http.StatusOK)
 	}
 }
@@ -140,7 +137,6 @@ func (s *server) handleDeckListCards() http.HandlerFunc {
 			log.Println(err)
 			return
 		}
-
 		s.WriteJSON(w, http.StatusOK, response{Cards: cards})
 	}
 }

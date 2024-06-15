@@ -13,7 +13,6 @@ func (s *server) handleCardCreate() http.HandlerFunc {
 	type request struct {
 		Card model.Card `json:"card"`
 	}
-
 	type response struct {
 		CardID int `json:"card_id"`
 	}
@@ -24,7 +23,6 @@ func (s *server) handleCardCreate() http.HandlerFunc {
 			http.Error(w, "", http.StatusUnauthorized)
 			return
 		}
-
 		req := request{}
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			http.Error(w, "", http.StatusInternalServerError)
@@ -46,7 +44,6 @@ func (s *server) handleCardCreate() http.HandlerFunc {
 		res := response{
 			CardID: c.ID,
 		}
-
 		s.WriteJSON(w, http.StatusOK, res)
 	}
 }
@@ -62,7 +59,6 @@ func (s *server) handleCardUpdate() http.HandlerFunc {
 			http.Error(w, "", http.StatusUnauthorized)
 			return
 		}
-
 		req := request{}
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			http.Error(w, "", http.StatusInternalServerError)
@@ -94,7 +90,6 @@ func (s *server) handleCardUpdate() http.HandlerFunc {
 			http.Error(w, "", http.StatusInternalServerError)
 			return
 		}
-
 		w.WriteHeader(http.StatusOK)
 	}
 }
@@ -123,7 +118,6 @@ func (s *server) handleCardDelete() http.HandlerFunc {
 			http.Error(w, "", http.StatusInternalServerError)
 			return
 		}
-
 		w.WriteHeader(http.StatusOK)
 	}
 }

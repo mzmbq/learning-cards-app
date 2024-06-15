@@ -44,7 +44,6 @@ func (s *server) handleUserCreate() http.HandlerFunc {
 			log.Println(err)
 			return
 		}
-
 		s.WriteJSON(w, http.StatusOK, u.ID)
 	}
 }
@@ -86,7 +85,6 @@ func (s *server) handleUserAuth() http.HandlerFunc {
 			log.Println(err)
 			return
 		}
-
 		s.WriteJSON(w, http.StatusOK, u.ID)
 	}
 }
@@ -125,7 +123,6 @@ func (s *server) handleUserWhoami() http.HandlerFunc {
 			http.Error(w, "", http.StatusUnauthorized)
 			return
 		}
-
 		s.WriteJSON(w, http.StatusOK, u)
 	}
 }
