@@ -46,7 +46,7 @@ const router = createBrowserRouter([
         element: <CardBrowser />,
       },
       {
-        path: "/study",
+        path: "/study/:deck_id",
         element: <StudyPage />,
       },
       {

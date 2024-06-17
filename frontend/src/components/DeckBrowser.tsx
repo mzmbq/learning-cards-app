@@ -1,7 +1,7 @@
 import { Button, Container, Group, LoadingOverlay, Table, TextInput } from "@mantine/core";
 import { useEffect, useState } from "react";
 import CONFIG from "../config";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import { Deck } from "../types";
 import ErrorPage from "./ErrorPage";
@@ -23,9 +23,13 @@ function DeckBrowser() {
       <Table.Td>{d.name}</Table.Td>
       <Table.Td>
         <Group gap="xs">
-          <Button disabled color="green">Study</Button>
+          <Link to={`/study/${d.id}`}>
+            <Button color="green" >Study</Button>
+          </Link>
+          <Link to={`/deck/${d.id}`}>
+            <Button color="blue">View</Button>
+          </Link>
           <Button disabled color="blue">Rename</Button>
-          <Button color="blue" onClick={() => navigate(`/deck/${d.id}`)}>View</Button>
           <Button color="red" onClick={() => deckDelete(d.id!)}>Delete</Button>
         </Group>
       </Table.Td>

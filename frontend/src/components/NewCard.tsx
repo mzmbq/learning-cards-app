@@ -51,9 +51,9 @@ function NewCard() {
 
       if (!response.ok) {
         if (response.status === 401) {
-          throw new Error("Unauthorized");
+          throw new Error("unauthorized");
         }
-        throw new Error("Failed to fetch decks");
+        throw new Error("failed to fetch decks");
       }
 
       const data = await response.json();
@@ -93,7 +93,7 @@ function NewCard() {
       });
 
       if (!response.ok) {
-        throw new Error(`Failed to create a card ${front} : ${back}`);
+        throw new Error(`failed to create a card ${front} : ${back}`);
       }
 
       setFront("");

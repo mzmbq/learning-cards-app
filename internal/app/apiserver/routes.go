@@ -18,4 +18,6 @@ func (s *server) routes() {
 	s.mux.Handle("POST /api/card/update/{id}", s.withAuth(s.handleCardUpdate()))
 	s.mux.Handle("GET /api/card/delete/{id}", s.withAuth(s.handleCardDelete()))
 
+	s.mux.Handle("GET /api/study/get-card/{deck_id}", s.withAuth(s.handleStudyGetCard()))
+	s.mux.Handle("POST /api/study/submit/{card_id}", s.withAuth(s.handleStudySubmit()))
 }

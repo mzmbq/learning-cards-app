@@ -70,9 +70,6 @@ export function Header() {
           </Group>
 
           <Group h="100%" gap={0}>
-            <Link to="/study" className={classes.link}>
-              Study
-            </Link>
 
             <Link to="/decks" className={classes.link}>
               My Decks
