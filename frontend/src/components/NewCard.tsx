@@ -1,4 +1,4 @@
-import { Button, Container, LoadingOverlay, Textarea } from "@mantine/core";
+import { Button, Container, LoadingOverlay, TextInput, Textarea } from "@mantine/core";
 import classes from "./NewCard.module.css";
 import { useEffect, useState } from "react";
 
@@ -16,7 +16,7 @@ function NewCard() {
   const [front, setFront] = useState("");
   const [back, setBack] = useState("");
 
-  const deckIDStr = useParams().id;
+  const deckID = Number(useParams().id);
 
   useEffect(() => {
     fetchCurrentDeck();
@@ -28,10 +28,9 @@ function NewCard() {
   }
 
   let card: Card;
-  if (deckIDStr === undefined) {
+  if (isNaN(deckID)) {
     setError("deck_id undefined");
   } else {
-    const deckID = parseInt(deckIDStr);
     card = {
       front: front,
       back: back,
@@ -41,6 +40,9 @@ function NewCard() {
   }
 
   const fetchCurrentDeck = async () => {
+    if (isNaN(deckID)) {
+      return;
+    }
     setLoading(true);
 
     try {
@@ -63,12 +65,12 @@ function NewCard() {
 
       // set current deck
       const decks: Deck[] = data.decks;
-      const deck = decks.find(d => d.id!.toString() === deckIDStr);
+      const deck = decks.find(d => d.id! === deckID);
 
       if (deck !== undefined) {
         setCurrentDeck(deck);
       } else {
-        setError(`invalid deck id "${deckIDStr}"`);
+        setError(`invalid deck id "${deckID}"`);
       }
 
     } catch (error: any) {
