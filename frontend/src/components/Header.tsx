@@ -11,36 +11,11 @@ import { Link } from "react-router-dom";
 import { useUserContext } from "../context/UserContext";
 import { useState } from "react";
 import CONFIG from "../config";
+import UserButton from "./UserButton";
 
 export function Header() {
-  const [loading, setLoading] = useState(false);
-  const { toggleColorScheme } = useMantineColorScheme();
 
-  const [user, setUser] = useUserContext();
-
-
-  const signOut = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch(`${CONFIG.backendURL}/api/user/signout`, {
-        method: "GET",
-        credentials: "include",
-      });
-
-      if (!response.ok) {
-        let errorText = await response.text();
-        throw new Error("Signout failed: " + errorText);
-      }
-
-      setUser({ ...user, userName: "" });
-
-
-    } catch (error: any) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [user, _] = useUserContext();
 
   const buttonsLoginSignup = (<>
     <Link to="/login">
@@ -51,16 +26,8 @@ export function Header() {
     </Link>
   </>);
 
-  const userButtonSignout = (<>
-    <p>Signed in as <b>{user.userName}</b></p>
-    <Link to="/login">
-      <Button onClick={() => signOut()}>Sign out</Button>
-    </Link>
-  </>);
-
   return (
     <Box pb={30}>
-      <LoadingOverlay visible={loading} />
 
       <header className={classes.header}>
         <Group justify="space-between">
@@ -70,21 +37,13 @@ export function Header() {
           </Group>
 
           <Group h="100%" gap={0}>
-
             <Link to="/decks" className={classes.link}>
               My Decks
             </Link>
-
-            {/* <Link to="/new-card" className={classes.link}>
-              New Card
-            </Link> */}
           </Group>
 
           <Group>
-            {
-              user.userName === "" ? buttonsLoginSignup : userButtonSignout
-            }
-            <Button onClick={() => toggleColorScheme()}>Dark/Light</Button>
+            {user.userName == "" ? buttonsLoginSignup : <UserButton />}
           </Group>
 
         </Group>
