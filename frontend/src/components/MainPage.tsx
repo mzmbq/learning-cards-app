@@ -7,16 +7,12 @@ function MainPage() {
   const [user] = useUserContext();
 
   if (user.userName !== "") {
-    navigate("/study");
+    navigate("/decks");
   }
 
   return (
     <>
-      <Box m="auto" maw={800}>
-        <h1>App</h1>
-        <p><Link to="/login">Log in</Link></p>
-        <p><Link to="/signup">Sign up</Link></p>
-      </Box>
+
     </>
   );
 }
