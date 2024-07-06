@@ -194,23 +194,33 @@ type CardRepository struct {
 
 func (r *CardRepository) Create(c *model.Card) error {
 	return r.store.db.QueryRow(
-		"INSERT INTO cards (front, back, deck_id) VALUES ($1, $2, $3) RETURNING id",
+		"INSERT INTO cards (front, back, deck_id, ease, interval, state, step, due) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id",
 		c.Front,
 		c.Back,
 		c.DeckID,
+		c.Flashcard.Ease,
+		c.Flashcard.Interval,
+		c.Flashcard.State,
+		c.Flashcard.Step,
+		c.Flashcard.Due,
 	).Scan(&c.ID)
 }
 
 func (r *CardRepository) Find(id int) (*model.Card, error) {
 	c := &model.Card{}
 	err := r.store.db.QueryRow(
-		"SELECT id, front, back, deck_id FROM cards WHERE id = $1",
+		"SELECT id, front, back, deck_id, ease, interval, state, step, due FROM cards WHERE id = $1",
 		id,
 	).Scan(
 		&c.ID,
 		&c.Front,
 		&c.Back,
 		&c.DeckID,
+		&c.Flashcard.Ease,
+		&c.Flashcard.Interval,
+		&c.Flashcard.State,
+		&c.Flashcard.Step,
+		&c.Flashcard.Due,
 	)
 
 	if err != nil {
@@ -223,32 +233,34 @@ func (r *CardRepository) Find(id int) (*model.Card, error) {
 	return c, nil
 }
 
-func (r *CardRepository) FindAllByDeckID(id int) ([]model.Card, error) {
+func (r *CardRepository) FindAllByDeckID(deckID int) ([]model.Card, error) {
 	rows, err := r.store.db.Query(
-		"SELECT id, front, back, deck_id FROM cards WHERE deck_id = $1",
-		id,
+		`SELECT id, front, back, deck_id, ease, interval, state, step, due FROM cards WHERE deck_id = $1`,
+		deckID,
 	)
 	if err != nil {
-		if err == sql.ErrNoRows {
-			return nil, store.ErrRecordNotFound
-		}
 		return nil, err
 	}
 	defer rows.Close()
 
 	cards := make([]model.Card, 0)
 	for rows.Next() {
-		card := model.Card{}
-		err = rows.Scan(
-			&card.ID,
-			&card.Front,
-			&card.Back,
-			&card.DeckID,
+		c := model.Card{}
+		err := rows.Scan(
+			&c.ID,
+			&c.Front,
+			&c.Back,
+			&c.DeckID,
+			&c.Flashcard.Ease,
+			&c.Flashcard.Interval,
+			&c.Flashcard.State,
+			&c.Flashcard.Step,
+			&c.Flashcard.Due,
 		)
 		if err != nil {
 			return nil, err
 		}
-		cards = append(cards, card)
+		cards = append(cards, c)
 	}
 
 	if err = rows.Err(); err != nil {
@@ -259,18 +271,21 @@ func (r *CardRepository) FindAllByDeckID(id int) ([]model.Card, error) {
 }
 
 func (r *CardRepository) Update(c *model.Card) error {
-	err := r.store.db.QueryRow(
-		"UPDATE cards SET (front, back, deck_id) = ($1, $2, $3) WHERE id = $4",
+	_, err := r.store.db.Exec(
+		"UPDATE cards SET front = $1, back = $2, deck_id = $3, ease = $4, interval = $5, state = $6, step = $7, due = $8 WHERE id = $9",
 		c.Front,
 		c.Back,
 		c.DeckID,
+		c.Flashcard.Ease,
+		c.Flashcard.Interval,
+		c.Flashcard.State,
+		c.Flashcard.Step,
+		c.Flashcard.Due,
 		c.ID,
-	).Err()
-
+	)
 	if err != nil {
 		return err
 	}
-
 	return nil
 }
 
