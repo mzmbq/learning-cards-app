@@ -37,6 +37,10 @@ db_down:
 	@echo "Stopping database container..."
 	@docker compose down
 
+.PHONY: test
+test:
+	@TESTDB_URL=$(TESTDB_URL) go test ./...
+
 
 
 .DEFAULT_GOAL := build
