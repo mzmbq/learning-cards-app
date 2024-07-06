@@ -14,6 +14,12 @@ func (s *server) handleStudyGetCard() http.HandlerFunc {
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
+		_, err := s.userFromRequest(r)
+		if err != nil {
+			http.Error(w, "", http.StatusUnauthorized)
+			return
+		}
+
 		s.WriteJSON(w, http.StatusOK, response{Card: model.Card{ID: 0, Front: "Mock", Back: "Data", DeckID: 0}})
 	}
 }

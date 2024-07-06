@@ -14,7 +14,7 @@ import (
 )
 
 func Start(config *Config) error {
-	db, err := newDB(config.DatabaseURL)
+	db, err := NewDB(config.DatabaseURL)
 	if err != nil {
 		return err
 	}
@@ -32,7 +32,7 @@ func Start(config *Config) error {
 	return http.ListenAndServe(config.BindAddr, srv)
 }
 
-func newDB(dbURL string) (*sql.DB, error) {
+func NewDB(dbURL string) (*sql.DB, error) {
 	log.Println("Connecting to database")
 	db, err := sql.Open("pgx", dbURL)
 	if err != nil {

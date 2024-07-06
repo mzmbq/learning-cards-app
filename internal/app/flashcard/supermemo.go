@@ -109,3 +109,9 @@ func toLearning(fc *model.Flashcard) {
 	fc.Step = 0
 	fc.Due = time.Now().Add(stepDelays[fc.Step])
 }
+
+func New() *model.Flashcard {
+	fc := &model.Flashcard{}
+	toLearning(fc)
+	return fc
+}
