@@ -3,8 +3,8 @@ package dict
 import (
 	"encoding/json"
 	"errors"
-	"log"
 	"net/http"
+	"regexp"
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
@@ -82,7 +82,6 @@ func (w *Wiktionary) Define(word string) ([]Entry, error) {
 	}
 
 	res := DefinitionsResponse{}
-	log.Println(resp.Body)
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
 		return nil, err
 	}
@@ -92,12 +91,30 @@ func (w *Wiktionary) Define(word string) ([]Entry, error) {
 		for _, d := range u.Definitions {
 			et := Entry{
 				Word:       word,
-				Definition: d.Definition,
-				Examples:   d.Examples,
+				Definition: sanitizeHTML(d.Definition),
+				// Examples:   d.Examples,
 			}
+			examples := make([]string, 0)
+			for _, ex := range d.Examples {
+				examples = append(examples, sanitizeHTML(ex))
+			}
+			et.Examples = examples
 			ets = append(ets, et)
 		}
 	}
 
 	return ets, nil
+}
+
+func sanitizeHTML(s string) string {
+	// replace bold with *
+	r := regexp.MustCompile(`</?b>`)
+	s = r.ReplaceAllString(s, "*")
+
+	// remove the rest of the tags
+
+	r = regexp.MustCompile(`<.*?>`)
+	s = r.ReplaceAllString(s, "")
+
+	return s
 }
