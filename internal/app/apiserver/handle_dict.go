@@ -26,6 +26,10 @@ func (s *server) handleSearch() http.HandlerFunc {
 
 		suggs, err := d.Search(word)
 		if err != nil {
+			if err == dict.ErrTooManyRequests {
+				http.Error(w, err.Error(), http.StatusTooManyRequests)
+				return
+			}
 			http.Error(w, "", http.StatusInternalServerError)
 			log.Println(err)
 			return
@@ -58,6 +62,10 @@ func (s *server) handleDefine() http.HandlerFunc {
 
 		defs, err := d.Define(word)
 		if err != nil {
+			if err == dict.ErrTooManyRequests {
+				http.Error(w, err.Error(), http.StatusTooManyRequests)
+				return
+			}
 			http.Error(w, "", http.StatusInternalServerError)
 			log.Println(err)
 			return

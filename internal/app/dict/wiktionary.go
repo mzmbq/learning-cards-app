@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
+	"golang.org/x/time/rate"
 )
 
 const (
@@ -15,7 +16,40 @@ const (
 	defineURL = "https://en.wiktionary.org/api/rest_v1/page/definition/"
 )
 
+var (
+	limiter = rate.NewLimiter(200, 200) // 200 req/s
+)
+
 type Wiktionary struct{}
+
+func (w *Wiktionary) Search(word string) ([]string, error) {
+	if !limiter.Allow() {
+		return nil, ErrTooManyRequests
+	}
+
+	// Fetch
+	resp, err := http.Get(searchURL + word)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	// Parse
+	doc, err := goquery.NewDocumentFromReader(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	results := make([]string, 0)
+	doc.Find(".mw-search-result-heading").Each(func(i int, s *goquery.Selection) {
+		result := strings.TrimSpace(s.Text())
+		if result != "" {
+			results = append(results, result)
+		}
+	})
+
+	return results, nil
+}
 
 type DefinitionsResponse struct {
 	Usages []UsageDescription `json:"en"`
@@ -32,34 +66,10 @@ type Definition struct {
 	Examples    []string `json:"examples,omitempty"`
 }
 
-func (w *Wiktionary) Search(word string) ([]string, error) {
-	results := make([]string, 0)
-
-	// Fetch
-	resp, err := http.Get(searchURL + word)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	// Parse
-	doc, err := goquery.NewDocumentFromReader(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-
-	doc.Find(".mw-search-result-heading").Each(func(i int, s *goquery.Selection) {
-		result := strings.TrimSpace(s.Text())
-		if result != "" {
-			results = append(results, result)
-		}
-	})
-
-	return results, nil
-}
-
 func (w *Wiktionary) Define(word string) ([]Entry, error) {
-	ets := make([]Entry, 0)
+	if !limiter.Allow() {
+		return nil, ErrTooManyRequests
+	}
 
 	// Fetch
 	resp, err := http.Get(defineURL + word)
@@ -77,6 +87,7 @@ func (w *Wiktionary) Define(word string) ([]Entry, error) {
 		return nil, err
 	}
 
+	ets := make([]Entry, 0)
 	for _, u := range res.Usages {
 		for _, d := range u.Definitions {
 			et := Entry{

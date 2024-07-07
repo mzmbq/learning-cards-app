@@ -1,6 +1,13 @@
 package dict
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+)
+
+var (
+	ErrTooManyRequests = errors.New("too many requests to the dictionary service")
+)
 
 type Entry struct {
 	Word       string
@@ -8,12 +15,12 @@ type Entry struct {
 	Examples   []string
 }
 
-type Parser interface {
+type Dict interface {
 	Search(word string) ([]string, error)
 	Define(word string) ([]Entry, error)
 }
 
-func New(dict string) (Parser, error) {
+func New(dict string) (Dict, error) {
 	switch dict {
 	case "wiktionary":
 		return &Wiktionary{}, nil
