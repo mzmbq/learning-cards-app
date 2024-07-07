@@ -20,4 +20,7 @@ func (s *server) routes() {
 
 	s.mux.Handle("GET /api/study/get-card/{deck_id}", s.withAuth(s.handleStudyGetCard()))
 	s.mux.Handle("POST /api/study/submit/{card_id}", s.withAuth(s.handleStudySubmit()))
+
+	s.mux.Handle("GET /api/define/{dict}/{word}", s.withAuth(s.handleDefine()))
+	s.mux.Handle("GET /api/search/{dict}/{word}", s.withAuth(s.handleSearch()))
 }
