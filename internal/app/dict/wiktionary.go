@@ -1,7 +1,9 @@
-package dictionary
+package dict
 
 import (
+	"encoding/json"
 	"errors"
+	"log"
 	"net/http"
 	"strings"
 
@@ -10,11 +12,24 @@ import (
 
 const (
 	searchURL = "https://en.wiktionary.org/w/index.php?fulltext=Search&search="
-	defineURL = "https://en.wiktionary.org/wiki/"
+	defineURL = "https://en.wiktionary.org/api/rest_v1/page/definition/"
 )
 
-type Wiktionary struct {
-	// lang        string
+type Wiktionary struct{}
+
+type DefinitionsResponse struct {
+	Usages []UsageDescription `json:"en"`
+}
+
+type UsageDescription struct {
+	PartOfSpeech string       `json:"partOfSpeech"`
+	Definitions  []Definition `json:"definitions"`
+}
+
+type Definition struct {
+	Description string   `json:"description"`
+	Definition  string   `json:"definition"`
+	Examples    []string `json:"examples,omitempty"`
 }
 
 func (w *Wiktionary) Search(word string) ([]string, error) {
@@ -56,24 +71,22 @@ func (w *Wiktionary) Define(word string) ([]Entry, error) {
 		return nil, errors.New("no defintion found")
 	}
 
-	// Parse
-	doc, err := goquery.NewDocumentFromReader(resp.Body)
-	if err != nil {
+	res := DefinitionsResponse{}
+	log.Println(resp.Body)
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
 		return nil, err
 	}
 
-	doc.Find(".use-with-mention").Each(func(_ int, s *goquery.Selection) {
-		et := Entry{
-			Word:       word,
-			Definition: s.Text(),
+	for _, u := range res.Usages {
+		for _, d := range u.Definitions {
+			et := Entry{
+				Word:       word,
+				Definition: d.Definition,
+				Examples:   d.Examples,
+			}
+			ets = append(ets, et)
 		}
-
-		s.Find(".h-usage-example").Each(func(_ int, sel *goquery.Selection) {
-			et.Examples = append(et.Examples, sel.Text())
-		})
-
-		ets = append(ets, et)
-	})
+	}
 
 	return ets, nil
 }

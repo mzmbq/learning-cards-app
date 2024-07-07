@@ -1,14 +1,14 @@
-package dictionary_test
+package dict_test
 
 import (
 	"testing"
 
-	"github.com/mzmbq/learning-cards-app/backend/internal/app/dictionary"
+	"github.com/mzmbq/learning-cards-app/backend/internal/app/dict"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestWiktionary_Search(t *testing.T) {
-	d := dictionary.Wiktionary{}
+	d := dict.Wiktionary{}
 	hits, err := d.Search("hello")
 
 	assert.Nil(t, err)
@@ -16,7 +16,7 @@ func TestWiktionary_Search(t *testing.T) {
 }
 
 func TestWiktionary_Define(t *testing.T) {
-	d := dictionary.Wiktionary{}
+	d := dict.Wiktionary{}
 
 	defs, err := d.Define("hello")
 	assert.Nil(t, err)
