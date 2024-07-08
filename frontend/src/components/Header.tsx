@@ -40,6 +40,9 @@ export function Header() {
             <Link to="/decks" className={classes.link}>
               My Decks
             </Link>
+            <Link to="/search" className={classes.link}>
+              Search
+            </Link>
           </Group>
 
           <Group>

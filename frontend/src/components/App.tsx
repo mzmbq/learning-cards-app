@@ -18,6 +18,7 @@ import NewCard from './NewCard';
 import { User, UserContext } from '../context/UserContext';
 import { useEffect, useState } from "react";
 import CONFIG from "../config";
+import SearchPage from "./SearchPage";
 
 
 const router = createBrowserRouter([
@@ -36,6 +37,10 @@ const router = createBrowserRouter([
       {
         path: "/signup",
         element: <SignUp />,
+      },
+      {
+        path: "/search",
+        element: <SearchPage />,
       },
       {
         path: "/decks",
