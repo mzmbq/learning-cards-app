@@ -4,11 +4,11 @@ import classes from "./UserButton.module.css";
 import { useUserContext } from "../context/UserContext";
 import CONFIG from "../config";
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { IconLogout, IconMoon } from "@tabler/icons-react";
 
-type Props = {};
 
-function UserButton({ }: Props) {
+function UserButton() {
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useUserContext();
   const navigate = useNavigate();
@@ -53,11 +53,15 @@ function UserButton({ }: Props) {
           <Menu.Label>
             {user.userName}
           </Menu.Label>
-          <Menu.Item>
-            <a onClick={() => toggleColorScheme()}>Toggle Theme</a>
+          <Menu.Item leftSection={<IconMoon />}>
+            <a onClick={() => toggleColorScheme()}>
+              Toggle Theme
+            </a>
           </Menu.Item>
-          <Menu.Item>
-            <a onClick={() => signOut()}>Sign out</a>
+          <Menu.Item leftSection={<IconLogout />}>
+            <a onClick={() => signOut()}>
+              Sign out
+            </a>
           </Menu.Item>
         </Menu.Dropdown>
       </Menu >

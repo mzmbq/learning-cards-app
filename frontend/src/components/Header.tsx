@@ -1,16 +1,11 @@
-
 import {
   Group,
   Button,
   Box,
-  useMantineColorScheme,
-  LoadingOverlay,
 } from "@mantine/core";
 import classes from "./Header.module.css";
 import { Link } from "react-router-dom";
 import { useUserContext } from "../context/UserContext";
-import { useState } from "react";
-import CONFIG from "../config";
 import UserButton from "./UserButton";
 
 export function Header() {
