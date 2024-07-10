@@ -1,4 +1,4 @@
-import { Button, Container, LoadingOverlay, TextInput, Textarea } from "@mantine/core";
+import { Button, Container, LoadingOverlay, Textarea } from "@mantine/core";
 import classes from "./NewCard.module.css";
 import { useEffect, useState } from "react";
 

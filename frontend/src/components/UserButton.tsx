@@ -1,4 +1,4 @@
-import { Avatar, Button, LoadingOverlay, Menu, useMantineColorScheme } from "@mantine/core";
+import { Avatar, LoadingOverlay, Menu, useMantineColorScheme } from "@mantine/core";
 
 import classes from "./UserButton.module.css";
 import { useUserContext } from "../context/UserContext";
@@ -53,15 +53,11 @@ function UserButton() {
           <Menu.Label>
             {user.userName}
           </Menu.Label>
-          <Menu.Item leftSection={<IconMoon />}>
-            <a onClick={() => toggleColorScheme()}>
-              Toggle Theme
-            </a>
+          <Menu.Item leftSection={<IconMoon />} onClick={() => toggleColorScheme()}>
+            Toggle Theme
           </Menu.Item>
-          <Menu.Item leftSection={<IconLogout />}>
-            <a onClick={() => signOut()}>
-              Sign out
-            </a>
+          <Menu.Item leftSection={<IconLogout />} onClick={() => signOut()}>
+            Sign out
           </Menu.Item>
         </Menu.Dropdown>
       </Menu >

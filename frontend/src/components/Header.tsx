@@ -10,7 +10,7 @@ import UserButton from "./UserButton";
 
 export function Header() {
 
-  const [user, _] = useUserContext();
+  const [user,] = useUserContext();
 
   const buttonsLoginSignup = (<>
     <Link to="/login">
@@ -41,7 +41,7 @@ export function Header() {
           </Group>
 
           <Group>
-            {user.userName == "" ? buttonsLoginSignup : <UserButton />}
+            {user.userName === "" ? buttonsLoginSignup : <UserButton />}
           </Group>
 
         </Group>

@@ -1,7 +1,7 @@
 import { Button, Container, Group, LoadingOverlay, Table, TextInput } from "@mantine/core";
 import { useEffect, useState } from "react";
 import CONFIG from "../config";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 import { Deck } from "../types";
 import ErrorPage from "./ErrorPage";
@@ -16,7 +16,6 @@ function DeckBrowser() {
   const [loading, setLoading] = useState(false);
   const [formInput, setFormInput] = useState("");
 
-  const navigate = useNavigate();
 
   const rows = decks.map((d) => (
     <Table.Tr key={d.id}>

@@ -61,7 +61,7 @@ function CardBrowser() {
 
   useEffect(() => {
     fetchCards(deckID);
-  }, []);
+  }, [deckID]);
 
   if (error) {
     return <ErrorPage message={error} />;
