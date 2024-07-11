@@ -1,11 +1,12 @@
 import { Button, Container, LoadingOverlay, Textarea } from "@mantine/core";
 import classes from "./NewCard.module.css";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { Card, Deck } from "../types";
 import CONFIG from "../config";
-import { useParams } from "react-router-dom";
+import { Link, NavLink, useParams } from "react-router-dom";
 import ErrorPage from "./ErrorPage";
+import { useHotkeys } from "@mantine/hooks";
 
 // TODO: don't rerender on each textfield change
 
@@ -16,28 +17,33 @@ function NewCard() {
   const [front, setFront] = useState("");
   const [back, setBack] = useState("");
 
+  const fronInputRef = useRef<HTMLTextAreaElement | null>(null);
+
   const deckID = Number(useParams().id);
 
   useEffect(() => {
     fetchCurrentDeck();
+    focusFront();
   }, []);
 
-
-  if (error) {
-    return <ErrorPage message={error} />;
-  }
-
   let card: Card;
-  if (isNaN(deckID)) {
-    setError("deck_id undefined");
-  } else {
-    card = {
-      front: front,
-      back: back,
-      deck_id: deckID,
-    };
-    console.log(card);
+  if (!error) {
+    if (isNaN(deckID)) {
+      setError("deck_id undefined");
+    } else {
+      card = {
+        front: front,
+        back: back,
+        deck_id: deckID,
+      };
+    }
   }
+
+  const focusFront = () => {
+    if (fronInputRef.current) {
+      fronInputRef.current.focus();
+    }
+  };
 
   const fetchCurrentDeck = async () => {
     if (isNaN(deckID)) {
@@ -84,10 +90,7 @@ function NewCard() {
 
   const cardCreate = async (card: Card) => {
     setLoading(true);
-
     try {
-
-
       const response = await fetch(`${CONFIG.backendURL}/api/card/create`, {
         method: "POST",
         body: JSON.stringify({ card: card }),
@@ -97,7 +100,6 @@ function NewCard() {
       if (!response.ok) {
         throw new Error(`failed to create a card ${front} : ${back}`);
       }
-
       setFront("");
       setBack("");
       await fetchCurrentDeck();
@@ -111,8 +113,16 @@ function NewCard() {
     }
   };
 
+  useHotkeys([
+    ["ctrl+enter", () => {
+      cardCreate(card);
+      focusFront();
+    }],
+  ], []);
 
-
+  if (error) {
+    return <ErrorPage message={error} />;
+  }
 
   return (
     <Container>
@@ -122,9 +132,11 @@ function NewCard() {
 
       <div className={classes.outerContainer}>
 
-        <p>Current Deck: <b>{currentDeck?.name}</b></p>
+        Current Deck:
+        <Link to={`/deck/${currentDeck?.id}`}>{currentDeck?.name}</Link>
 
         <Textarea
+          ref={fronInputRef}
           label="Front side"
           autosize
           minRows={3}
