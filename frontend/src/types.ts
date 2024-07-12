@@ -11,3 +11,9 @@ export type Card = {
 
   deck_id: number;
 };
+
+export type DictionaryEntry = {
+  word: string;
+  definition: string;
+  examples?: string[];
+};

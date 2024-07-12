@@ -10,9 +10,9 @@ var (
 )
 
 type Entry struct {
-	Word       string
-	Definition string
-	Examples   []string
+	Word       string   `json:"word"`
+	Definition string   `json:"definition"`
+	Examples   []string `json:"examples"`
 }
 
 type Dict interface {

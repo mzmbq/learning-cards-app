@@ -1,20 +1,38 @@
-import { Autocomplete, Container } from '@mantine/core';
+import { Autocomplete, Button, Container, LoadingOverlay, Select } from '@mantine/core';
 import { useEffect, useState } from 'react';
 import ErrorPage from './ErrorPage';
 import CONFIG from '../config';
+import classes from "./SearchPage.module.css";
+import { IconSearch } from '@tabler/icons-react';
+import { DictionaryEntry } from '../types';
+import SearchResult from './SearchResult';
 
-
-type Suggestions = {
+type SuggestionsResponse = {
   suggestions: string[];
 };
 
-const dict = "wiktionary";
+type DefineResponse = {
+  definitions: DictionaryEntry[];
+};
+
+const dictionalries = [
+  "wiktionary",
+];
+
+const e: DictionaryEntry = {
+  word: "test",
+  definition: "test",
+  examples: ["test", "test"],
+};
 
 export default function SearchPage() {
-  const [formInput, setFormInput] = useState("");
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [dropdownValues, setDropdownValues] = useState<string[]>([]);
-
+  const [formInput, setFormInput] = useState("");
+  const [suggestions, setDropdownValues] = useState<string[]>([]);
+  const [selectedDict, setSelectedDict] = useState<string | null>(dictionalries[0]);
+  const [entries, setEntries] = useState<DictionaryEntry[]>([]);
+  const [searchPerformed, setSearchPerformed] = useState(false);
 
   const fetchSuggestions = async () => {
     if (formInput === "") {
@@ -22,7 +40,7 @@ export default function SearchPage() {
       return;
     }
     try {
-      const response = await fetch(`${CONFIG.backendURL}/api/search/${dict}/${formInput}`, {
+      const response = await fetch(`${CONFIG.backendURL}/api/search/${selectedDict}/${formInput}`, {
         method: "GET",
         credentials: "include",
       });
@@ -30,16 +48,42 @@ export default function SearchPage() {
       if (!response.ok) {
         console.log(`Failed to fetch suggestions for ${formInput}`);
       }
-
-      const suggestions: Suggestions = await response.json();
-
-      setDropdownValues(suggestions.suggestions);
+      const sugg: SuggestionsResponse = await response.json();
+      setDropdownValues(sugg.suggestions);
 
     } catch (error: any) {
       console.error(error);
       setError(error.message);
     }
   };
+
+  const doSearch = async () => {
+    if (formInput === "") {
+      return;
+    }
+    try {
+      setSearchPerformed(true);
+      setLoading(true);
+      const response = await fetch(`${CONFIG.backendURL}/api/define/${selectedDict}/${formInput}`, {
+        method: "GET",
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        throw new Error("doSearch failed");
+      }
+
+      const data: DefineResponse = await response.json();
+      setEntries(data.definitions);
+
+    } catch (error: any) {
+      console.error(error);
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -56,8 +100,32 @@ export default function SearchPage() {
 
   return (
     <Container>
+      <LoadingOverlay visible={loading} />
+
       <h2>Search</h2>
-      <Autocomplete data={dropdownValues} value={formInput} onChange={(s) => setFormInput(s)} />
+      <div className={classes.searchForm}>
+        <Autocomplete
+          data={suggestions}
+          value={formInput}
+          onChange={(s) => setFormInput(s)}
+          style={{ width: '100%' }}
+        />
+        <Select
+          value={selectedDict}
+          onChange={(value) => setSelectedDict(value)}
+          data={dictionalries.map((d) => ({ value: d, label: d }))}
+        />
+        <Button onClick={doSearch}>
+          <IconSearch />
+        </Button>
+      </div>
+
+      {searchPerformed && <p>{entries.length} Results</p>}
+      {searchPerformed && !entries && <h3>No Results</h3>}
+      {searchPerformed && entries.map((entry, index) => (
+        <SearchResult key={index} entry={entry} onPress={() => { }} />
+      ))}
+
 
     </Container>
   );
