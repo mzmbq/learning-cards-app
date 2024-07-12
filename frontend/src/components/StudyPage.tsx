@@ -102,8 +102,12 @@ function StudyPage() {
 
       <div className={classes.cardContainer}>
 
-        <div className={classes.cardFront}><p>{card?.front}</p></div>
-        <div className={classes.cardBack}>{backVisible && <p>{card?.back}</p>}</div>
+        <div className={classes.cardFront}>
+          <p>{card?.front}</p>
+        </div>
+        <div className={classes.cardBack}>
+          {backVisible && <p>{card?.back}</p>}
+        </div>
 
         <div className={classes.buttons}>
           {!backVisible && <Button onClick={() => setbackVisible(true)}>Show Answwer</Button>}

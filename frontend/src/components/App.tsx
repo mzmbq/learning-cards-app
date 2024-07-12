@@ -14,7 +14,7 @@ import Login from './Login';
 import SignUp from './SignUp';
 import NotFoundPage from './NotFoundPage';
 import StudyPage from './StudyPage';
-import NewCard from './NewCard';
+import CardCreator from './CardCreator';
 import { User, UserContext } from '../context/UserContext';
 import { useEffect, useState } from "react";
 import CONFIG from "../config";
@@ -56,7 +56,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/new-card/:id",
-        element: <NewCard />,
+        element: <CardCreator />,
       }
     ],
   },

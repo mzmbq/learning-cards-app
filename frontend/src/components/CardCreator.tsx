@@ -4,13 +4,13 @@ import { useEffect, useRef, useState } from "react";
 
 import { Card, Deck } from "../types";
 import CONFIG from "../config";
-import { Link, NavLink, useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import ErrorPage from "./ErrorPage";
 import { useHotkeys } from "@mantine/hooks";
 
-// TODO: don't rerender on each textfield change
 
-function NewCard() {
+
+function CardCreator() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [currentDeck, setCurrentDeck] = useState<Deck | null>(null);
@@ -165,4 +165,4 @@ function NewCard() {
   );
 }
 
-export default NewCard;
+export default CardCreator;
