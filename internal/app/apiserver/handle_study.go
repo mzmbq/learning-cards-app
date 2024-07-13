@@ -4,7 +4,11 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"sort"
+	"strconv"
+	"time"
 
+	"github.com/mzmbq/learning-cards-app/backend/internal/app/flashcard"
 	"github.com/mzmbq/learning-cards-app/backend/internal/app/model"
 )
 
@@ -14,19 +18,48 @@ func (s *server) handleStudyGetCard() http.HandlerFunc {
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
-		_, err := s.userFromRequest(r)
+		u, err := s.userFromRequest(r)
 		if err != nil {
 			http.Error(w, "", http.StatusUnauthorized)
 			return
 		}
 
-		s.WriteJSON(w, http.StatusOK, response{Card: model.Card{ID: 0, Front: "Mock", Back: "Data", DeckID: 0}})
+		deckIDStr := r.PathValue("deck_id")
+		deckID, err := strconv.Atoi(deckIDStr)
+		if err != nil {
+			http.Error(w, "invalid deck id", http.StatusBadRequest)
+			return
+		}
+
+		if !s.store.Deck().BelongsToUser(deckID, u.ID) {
+			http.Error(w, "", http.StatusUnauthorized)
+			return
+		}
+
+		// temporary solution: get the card with the earliest due date
+		cards, err := s.store.Card().FindAllByDeckID(deckID)
+		if err != nil {
+			http.Error(w, "", http.StatusInternalServerError)
+			log.Println(err)
+			return
+		}
+		sort.Slice(cards, func(i, j int) bool {
+			return cards[i].Flashcard.Due.Before(cards[j].Flashcard.Due)
+		})
+
+		if cards[0].Flashcard.Due.After(time.Now()) {
+			http.Error(w, "", http.StatusNoContent)
+			return
+		}
+
+		s.WriteJSON(w, http.StatusOK, response{Card: cards[0]})
 	}
 }
 
 func (s *server) handleStudySubmit() http.HandlerFunc {
 	type request struct {
-		Status int `json:"status"`
+		CardID int `json:"card_id"`
+		Status int `json:"status"` // flashcard.Again ... flashcard.Easy
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -35,8 +68,39 @@ func (s *server) handleStudySubmit() http.HandlerFunc {
 			http.Error(w, "", http.StatusInternalServerError)
 			return
 		}
+		u, err := s.userFromRequest(r)
+		if err != nil {
+			http.Error(w, "", http.StatusUnauthorized)
+			return
+		}
+		// validate request
+		if !s.store.Card().BelongsToUser(req.CardID, u.ID) {
+			http.Error(w, "", http.StatusUnauthorized)
+			log.Print("card does not belong to user")
+			return
+		}
+		if req.Status < 0 || req.Status > 3 {
+			http.Error(w, "", http.StatusBadRequest)
+			return
+		}
+		// update flashcard
+		c, err := s.store.Card().Find(req.CardID)
+		if err != nil {
+			http.Error(w, "", http.StatusInternalServerError)
+			log.Println(err)
+			return
+		}
+		if err := flashcard.SuperMemoAnki(&c.Flashcard, req.Status); err != nil {
+			http.Error(w, "", http.StatusInternalServerError)
+			log.Println(err)
+			return
+		}
+		if err := s.store.Card().Update(c); err != nil {
+			http.Error(w, "", http.StatusInternalServerError)
+			log.Println(err)
+			return
+		}
 
-		log.Println(req.Status)
 		w.WriteHeader(http.StatusOK)
 	}
 }

@@ -7,34 +7,27 @@ import ErrorPage from "./ErrorPage";
 import { Card } from "../types";
 import CONFIG from "../config";
 
-const frontText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
-const backText = frontText;
-
 enum Status {
   Again = 0,
   Hard,
   Good,
   Easy,
 }
+const statusNoContent = 204;
 
 function StudyPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [backVisible, setbackVisible] = useState(false);
-  const [front, setFront] = useState(frontText);
-  const [back, setBack] = useState(backText);
-
   const [card, setCard] = useState<Card | undefined>(undefined);
+
+  const [done, setDone] = useState(false);
 
   const deckIDStr = useParams().deck_id;
 
   useEffect(
     () => { fetchCard(); },
     []);
-
-  if (error) {
-    return <ErrorPage message={error} />;
-  }
 
   const fetchCard = async () => {
     if (deckIDStr === undefined) {
@@ -56,6 +49,12 @@ function StudyPage() {
       });
 
       if (!response.ok) {
+        console.log(response.status);
+        if (response.status === statusNoContent) {
+          setDone(true);
+          setLoading(false);
+          return;
+        }
         throw new Error("failed to fetch a card");
       }
 
@@ -78,12 +77,14 @@ function StudyPage() {
       const response = await fetch(`${CONFIG.backendURL}/api/study/submit/${card?.id}`, {
         method: "POST",
         credentials: "include",
-        body: JSON.stringify({ status: status }),
+        body: JSON.stringify({ card_id: card?.id, status: status }),
       });
 
       if (!response.ok) {
         throw new Error("failed to submit");
       }
+
+      fetchCard();
 
     } catch (error: any) {
       console.error(error);
@@ -93,6 +94,18 @@ function StudyPage() {
     }
   };
 
+  if (error) {
+    return <ErrorPage message={error} />;
+  }
+
+  if (done) {
+    return (
+      <Container>
+        <h2>Study</h2>
+        <p>Done!</p>
+      </Container>
+    );
+  }
 
   return (
     <Container>

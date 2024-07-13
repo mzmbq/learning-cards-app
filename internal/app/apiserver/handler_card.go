@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/mzmbq/learning-cards-app/backend/internal/app/flashcard"
 	"github.com/mzmbq/learning-cards-app/backend/internal/app/model"
 )
 
@@ -30,6 +31,8 @@ func (s *server) handleCardCreate() http.HandlerFunc {
 		}
 
 		c := req.Card
+		fc := flashcard.New()
+		c.Flashcard = *fc
 
 		if !s.store.Deck().BelongsToUser(c.DeckID, u.ID) {
 			http.Error(w, "", http.StatusUnauthorized)
