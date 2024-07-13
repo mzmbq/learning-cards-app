@@ -1,5 +1,5 @@
 import { Button, Container, LoadingOverlay } from "@mantine/core";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import classes from "./StudyPage.module.css";
 import { useParams } from "react-router-dom";
@@ -21,23 +21,20 @@ function StudyPage() {
   const [backVisible, setbackVisible] = useState(false);
   const [card, setCard] = useState<Card | undefined>(undefined);
 
-  const [done, setDone] = useState(false);
+  const [noCardsLeft, setNoCardsLeft] = useState(false);
 
   const deckIDStr = useParams().deck_id;
 
-  useEffect(
-    () => { fetchCard(); },
-    []);
 
-  const fetchCard = async () => {
+  const fetchCard = useCallback(async () => {
     if (deckIDStr === undefined) {
       setError("deck id is undefined");
-      return <></>;
+      return;
     }
     const deckID = parseInt(deckIDStr);
     if (isNaN(deckID)) {
       setError("invalid deck id");
-      return <></>;
+      return;
     }
 
     try {
@@ -48,13 +45,12 @@ function StudyPage() {
         credentials: "include",
       });
 
+      if (response.status === statusNoContent) {
+        setNoCardsLeft(true);
+        return;
+      }
+
       if (!response.ok) {
-        console.log(response.status);
-        if (response.status === statusNoContent) {
-          setDone(true);
-          setLoading(false);
-          return;
-        }
         throw new Error("failed to fetch a card");
       }
 
@@ -67,8 +63,11 @@ function StudyPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [deckIDStr]);
 
+  useEffect(
+    () => { fetchCard(); },
+    [fetchCard]);
 
   const submitCard = async (status: Status) => {
     try {
@@ -98,7 +97,7 @@ function StudyPage() {
     return <ErrorPage message={error} />;
   }
 
-  if (done) {
+  if (noCardsLeft) {
     return (
       <Container>
         <h2>Study</h2>
