@@ -47,8 +47,9 @@ func (s *server) handleStudyGetCard() http.HandlerFunc {
 			return cards[i].Flashcard.Due.Before(cards[j].Flashcard.Due)
 		})
 
-		if cards[0].Flashcard.Due.After(time.Now()) {
+		if cards[0].Flashcard.Due.After(time.Now().Add(5 * time.Minute)) {
 			http.Error(w, "", http.StatusNoContent)
+			log.Print("Card ", cards[0].Front, " is due ", cards[0].Flashcard.Due, " now is ", time.Now())
 			return
 		}
 

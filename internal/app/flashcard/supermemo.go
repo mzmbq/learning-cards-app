@@ -7,8 +7,8 @@ import (
 	"github.com/mzmbq/learning-cards-app/backend/internal/app/model"
 )
 
-// Anki's algorithm: https://faqs.ankiweb.net/what-spaced-repetition-algorithm.html
-// SM-2: https://en.wikipedia.org/wiki/SuperMemo#Description_of_SM-2_algorithm
+// Anki's legacy algorithm: https://faqs.ankiweb.net/what-spaced-repetition-algorithm.html
+// based on SM-2: https://en.wikipedia.org/wiki/SuperMemo#Description_of_SM-2_algorithm
 
 const (
 	Again = iota

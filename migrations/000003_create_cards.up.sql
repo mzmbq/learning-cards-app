@@ -8,5 +8,5 @@ CREATE TABLE IF NOT EXISTS cards (
     interval bigint,
     "state" integer,
     step integer,
-    due timestamp
+    due timestamp with time zone
 );

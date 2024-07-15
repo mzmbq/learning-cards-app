@@ -84,6 +84,7 @@ function StudyPage() {
       }
 
       fetchCard();
+      setbackVisible(false);
 
     } catch (error: any) {
       console.error(error);
