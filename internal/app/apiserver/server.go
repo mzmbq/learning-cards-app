@@ -18,16 +18,18 @@ type contextKey string
 const ctxKeyUserID contextKey = "userID"
 
 type server struct {
-	mux           *middlewareMux
+	mux           *http.ServeMux
 	store         store.Store
 	sessionsStore sessions.Store
 
+	middlewares []Middleware
+	// allowed origins for CORS
 	corsOrigins []string
 }
 
 func newServer(store store.Store, sessionsStore sessions.Store, corsOrigins []string) *server {
 	s := &server{
-		mux:           newMiddlewareMux(),
+		mux:           http.NewServeMux(),
 		store:         store,
 		sessionsStore: sessionsStore,
 		corsOrigins:   corsOrigins,
@@ -69,4 +71,20 @@ func (s *server) userFromRequest(r *http.Request) (*model.User, error) {
 	}
 
 	return u, nil
+}
+
+func (s *server) Use(ms ...Middleware) {
+	s.middlewares = append(s.middlewares, ms...)
+}
+
+func (s *server) Handle(pattern string, handler http.Handler) {
+	for i := range s.middlewares {
+		// aply last added middleware first
+		handler = s.middlewares[len(s.middlewares)-1-i](handler)
+	}
+	s.mux.Handle(pattern, handler)
+}
+
+func (s *server) HandleNoMiddleware(pattern string, handler http.Handler) {
+	s.mux.Handle(pattern, handler)
 }
