@@ -5,14 +5,14 @@ import { useUserContext } from "../context/UserContext";
 import CONFIG from "../config";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { IconLogout, IconMoon } from "@tabler/icons-react";
+import { IconLogout, IconMoon, IconSun } from "@tabler/icons-react";
 
 
 function UserButton() {
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useUserContext();
   const navigate = useNavigate();
-  const { toggleColorScheme } = useMantineColorScheme();
+  const { colorScheme, toggleColorScheme } = useMantineColorScheme();
 
 
   const signOut = async () => {
@@ -53,7 +53,7 @@ function UserButton() {
           <Menu.Label>
             {user.userName}
           </Menu.Label>
-          <Menu.Item leftSection={<IconMoon />} onClick={() => toggleColorScheme()}>
+          <Menu.Item leftSection={colorScheme === "light" ? <IconMoon /> : <IconSun />} onClick={() => toggleColorScheme()}>
             Toggle Theme
           </Menu.Item>
           <Menu.Item leftSection={<IconLogout />} onClick={() => signOut()}>
