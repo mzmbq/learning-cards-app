@@ -10,5 +10,16 @@ services:
     volumes:
       - psql_volume:/var/lib/postgresql/data
 
+  backend:
+    build: .
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql://${DB_USERNAME}:${DB_PASSWORD}@psql:${DB_PORT}/${DB_DATABASE}?sslmode=disable
+    ports:
+      - "8080:8080"
+    depends_on:
+      - psql
+
 volumes:
   psql_volume:

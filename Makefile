@@ -8,8 +8,8 @@ build:
 	@go build -o ./bin/apiserver -v ./cmd/apiserver
 
 .PHONY: run
-run:
-	@go run -v ./cmd/apiserver
+run: build
+	@./bin/apiserver
 
 .PHONY: run_frontend
 run_frontend:
