@@ -16,10 +16,17 @@ services:
       - .env
     environment:
       DATABASE_URL: postgresql://${DB_USERNAME}:${DB_PASSWORD}@psql:${DB_PORT}/${DB_DATABASE}?sslmode=disable
-    ports:
-      - "8080:8080"
+    # ports:
+    #   - "8080:8080"
     depends_on:
       - psql
+
+  frontend:
+    build:
+      context: .
+      dockerfile: ./frontend/Dockerfile
+    ports:
+      - "8080:8080"
 
 volumes:
   psql_volume:
