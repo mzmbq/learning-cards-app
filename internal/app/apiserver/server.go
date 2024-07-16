@@ -88,3 +88,9 @@ func (s *server) Handle(pattern string, handler http.Handler) {
 func (s *server) HandleNoMiddleware(pattern string, handler http.Handler) {
 	s.mux.Handle(pattern, handler)
 }
+
+func (s *server) handleHealthcheck() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		s.WriteJSON(w, http.StatusOK, map[string]string{"status": "ok"})
+	})
+}

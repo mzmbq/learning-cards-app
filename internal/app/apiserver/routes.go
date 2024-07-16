@@ -3,6 +3,8 @@ package apiserver
 func (s *server) routes() {
 	s.Use(s.withLogging, s.withCORS, s.withAuth)
 
+	s.HandleNoMiddleware("GET /health", s.withCORS(s.handleHealthcheck()))
+
 	s.HandleNoMiddleware("POST /api/user/create", s.withLogging(s.withCORS(s.handleUserCreate())))
 	s.HandleNoMiddleware("POST /api/user/auth", s.withLogging(s.withCORS(s.handleUserAuth())))
 	s.Handle("GET /api/user/whoami", s.handleUserWhoami())
