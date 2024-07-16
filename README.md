@@ -11,10 +11,16 @@
    cd learning-cards-app
    ```
 
-2. **Run Docker Compose**
+2. **Setup the environemnt**:
+
+   ```bash
+   mv .env.example .env
+   ```
+
+3. **Run Docker Compose**
 
    ```bash
    docker compose up
    ```
 
-3. **Access at [http://localhost:8080](http://localhost:8080)**
+4. **Access at [http://localhost:8080](http://localhost:8080)**

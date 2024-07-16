@@ -7,7 +7,7 @@ COPY internal internal
 COPY go.mod go.mod 
 COPY go.sum go.sum
 COPY Makefile Makefile
-COPY .env.example .env
+COPY .env .env
 
 ENV GOARCH=amd64
 RUN CGO_ENABLED=0 make build
