@@ -28,7 +28,7 @@ function SignUp() {
     },
   });
 
-  const handleSubmit = async (values: SignUpFormValues) => {
+  const doSignup = async (values: SignUpFormValues) => {
     setIsLoading(true);
 
     try {
@@ -45,7 +45,7 @@ function SignUp() {
       }
 
 
-      navigate("/decks");
+      navigate("/login");
 
     } catch (error: any) {
       console.error(error);
@@ -67,7 +67,7 @@ function SignUp() {
 
       <h2>Create an account</h2>
 
-      <form onSubmit={form.onSubmit(handleSubmit)}>
+      <form onSubmit={form.onSubmit(doSignup)}>
         <TextInput
           label="Email Address"
           placeholder=""
