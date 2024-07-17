@@ -21,11 +21,11 @@ clean:
 
 .PHONY: migrate_up
 migrate_up:
-	@migrate -path=./migrations -database=$(DATABASE_URL) -verbose up
+	@migrate -path ./migrations -database $(DATABASE_URL) -verbose up
 
 .PHONY: migrate_down
 migrate_down:
-	@migrate -path=./migrations -database=$(DATABASE_URL) -verbose down
+	@migrate -path ./migrations -database $(DATABASE_URL) -verbose down
 
 .PHONY: db_up
 db_up:

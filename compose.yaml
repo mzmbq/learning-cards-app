@@ -8,7 +8,31 @@ services:
     ports:
       - "${DB_PORT}:5432"
     volumes:
-      - psql_volume:/var/lib/postgresql/data
+      - psql_volume:/var/lib/postgresql/data\
+    healthcheck:
+      test: pg_isready -U ${DB_USERNAME} -d ${DB_DATABASE}
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  migrate:
+    image: migrate/migrate
+    volumes:
+      - ./migrations:/migrations
+    env_file:
+      - .env
+    command:
+      [
+        "-path",
+        "/migrations",
+        "-database",
+        "postgresql://${DB_USERNAME}:${DB_PASSWORD}@psql:${DB_PORT}/${DB_DATABASE}?sslmode=disable",
+        "-verbose",
+        "up",
+      ]
+    depends_on:
+      psql:
+        condition: service_healthy
 
   backend:
     build: .

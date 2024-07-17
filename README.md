@@ -17,19 +17,10 @@
    mv .env.example .env
    ```
 
-3. **Run Docker Compose**
+3. **Start the application**
 
    ```bash
    docker compose up
    ```
 
-4. **In another terminal window, run DB migrations**
-   <!-- TODO: Find a better solution -->
-
-   github.com/golang-migrate/migrate required
-
-   ```bash
-   make migrate_up
-   ```
-
-5. **Access at [http://localhost:8080](http://localhost:8080)**
+4. **Access at [http://localhost:8080](http://localhost:8080)**
