@@ -56,3 +56,14 @@ func (s *server) withAuth(h http.Handler) http.Handler {
 		h.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
+
+func (s *server) withRateLimit(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if !s.rateLimiter.Allow() {
+			http.Error(w, "too many requests", http.StatusTooManyRequests)
+			return
+		}
+
+		h.ServeHTTP(w, r)
+	})
+}

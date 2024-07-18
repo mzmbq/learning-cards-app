@@ -6,6 +6,7 @@ type Config struct {
 	DatabaseURL string   `toml:"database_url" envconfig:"DATABASE_URL"`
 	SessionKey  string   `toml:"session_key" envconfig:"SESSION_KEY"`
 	CORSOrigins []string `toml:"cors_origins" envconfig:"CORS_ORIGINS"`
+	RateLimit   int      `toml:"global_rate_limit" envconfig:"GLOBAL_RATE_LIMIT"`
 }
 
 func NewConfig() *Config {

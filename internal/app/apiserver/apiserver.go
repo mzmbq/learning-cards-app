@@ -27,7 +27,7 @@ func Start(config *Config) error {
 	}
 	sessionStore := sessions.NewCookieStore(sessionKey)
 
-	srv := newServer(store, sessionStore, config.CORSOrigins)
+	srv := newServer(store, sessionStore, config.CORSOrigins, config.RateLimit)
 
 	return http.ListenAndServe(config.BindAddr, srv)
 }

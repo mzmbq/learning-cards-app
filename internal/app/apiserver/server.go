@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/sessions"
+	"golang.org/x/time/rate"
 
 	"github.com/mzmbq/learning-cards-app/backend/internal/app/model"
 	"github.com/mzmbq/learning-cards-app/backend/internal/app/store"
@@ -25,14 +26,16 @@ type server struct {
 	middlewares []Middleware
 	// allowed origins for CORS
 	corsOrigins []string
+	rateLimiter *rate.Limiter
 }
 
-func newServer(store store.Store, sessionsStore sessions.Store, corsOrigins []string) *server {
+func newServer(store store.Store, sessionsStore sessions.Store, corsOrigins []string, rateLimit int) *server {
 	s := &server{
 		mux:           http.NewServeMux(),
 		store:         store,
 		sessionsStore: sessionsStore,
 		corsOrigins:   corsOrigins,
+		rateLimiter:   rate.NewLimiter(rate.Limit(rateLimit), rateLimit),
 	}
 
 	s.routes()

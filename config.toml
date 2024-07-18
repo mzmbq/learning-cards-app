@@ -1,3 +1,4 @@
 backend_bind_addr = ":8080"
 log_level = "debug"
 cors_origins = ["http://localhost:3000"]
+global_rate_limit = 10
