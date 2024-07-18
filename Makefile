@@ -30,12 +30,12 @@ migrate_down:
 .PHONY: db_up
 db_up:
 	@echo "Starting database container..."
-	@docker compose up -d
+	@docker compose up -d psql
 
 .PHONY: db_down
 db_down:
 	@echo "Stopping database container..."
-	@docker compose down
+	@docker compose down psql
 
 .PHONY: test
 test:
