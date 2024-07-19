@@ -43,7 +43,8 @@ services:
     # ports:
     #   - "8080:8080"
     depends_on:
-      - psql
+      psql:
+        condition: service_healthy
 
   frontend:
     build:
@@ -51,6 +52,8 @@ services:
       dockerfile: ./frontend/Dockerfile
     ports:
       - "8080:8080"
+    depends_on:
+      - backend
 
 volumes:
   psql_volume:
