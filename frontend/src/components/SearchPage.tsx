@@ -1,8 +1,7 @@
-import { Autocomplete, Button, Container, LoadingOverlay, Select } from '@mantine/core';
+import { Autocomplete, Button, Container, Group, LoadingOverlay, Select } from '@mantine/core';
 import { useEffect, useState } from 'react';
 import ErrorPage from './ErrorPage';
 import CONFIG from '../config';
-import classes from "./SearchPage.module.css";
 import { IconSearch } from '@tabler/icons-react';
 import { DictionaryEntry } from '../types';
 import SearchResult from './SearchResult';
@@ -103,22 +102,27 @@ export default function SearchPage() {
       <LoadingOverlay visible={loading} />
 
       <h2>Search</h2>
-      <div className={classes.searchForm}>
+      <Group
+        gap="sm">
+
         <Autocomplete
           data={suggestions}
           value={formInput}
           onChange={(s) => setFormInput(s)}
-          style={{ width: '100%' }}
+          style={{ width: '50%' }}
         />
         <Select
           value={selectedDict}
           onChange={(value) => setSelectedDict(value)}
           data={dictionalries.map((d) => ({ value: d, label: d }))}
         />
-        <Button onClick={doSearch}>
-          <IconSearch />
+        <Button
+          leftSection={<IconSearch />}
+          onClick={doSearch}
+        >
+          Search
         </Button>
-      </div>
+      </Group>
 
       {searchPerformed && <p>{entries.length} Results</p>}
       {searchPerformed && !entries && <h3>No Results</h3>}

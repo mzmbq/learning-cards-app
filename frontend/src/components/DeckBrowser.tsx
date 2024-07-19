@@ -1,10 +1,12 @@
-import { Button, Container, Group, LoadingOverlay, Table, TextInput } from "@mantine/core";
+import { ActionIcon, Button, Container, Group, LoadingOverlay, Table, Text, TextInput } from "@mantine/core";
 import { useEffect, useState } from "react";
 import CONFIG from "../config";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import { Deck } from "../types";
 import ErrorPage from "./ErrorPage";
+import { IconCards, IconCirclePlus, IconCirclePlus2, IconListSearch, IconPlus, IconTrash } from "@tabler/icons-react";
+import DeckBrowserRow from "./DeckBrowserRow";
 
 type DeckCreateReqBody = {
   deckName: string;
@@ -17,23 +19,7 @@ function DeckBrowser() {
   const [formInput, setFormInput] = useState("");
 
 
-  const rows = decks.map((d) => (
-    <Table.Tr key={d.id}>
-      <Table.Td>{d.name}</Table.Td>
-      <Table.Td>
-        <Group gap="xs">
-          <Link to={`/study/${d.id}`}>
-            <Button color="green" >Study</Button>
-          </Link>
-          <Link to={`/deck/${d.id}`}>
-            <Button color="blue">View</Button>
-          </Link>
-          <Button disabled color="blue">Rename</Button>
-          <Button color="red" onClick={() => deckDelete(d.id!)}>Delete</Button>
-        </Group>
-      </Table.Td>
-    </Table.Tr>
-  ));
+
 
   const fetchDecks = async () => {
     setLoading(true);
@@ -82,6 +68,7 @@ function DeckBrowser() {
         throw new Error(`Failed to create a deck ${formInput}`);
       }
       await fetchDecks();
+      setFormInput("");
 
     } catch (error: any) {
       console.error(error);
@@ -120,6 +107,10 @@ function DeckBrowser() {
     fetchDecks();
   }, []);
 
+  const rows = decks.map((d) => (
+    <DeckBrowserRow key={d.id} deck={d} deckDelete={deckDelete} />
+  ));
+
   if (error) {
     return <ErrorPage message={error} />;
   }
@@ -128,21 +119,13 @@ function DeckBrowser() {
     <Container>
       <LoadingOverlay visible={loading} />
 
-      <h2>Decks</h2>
-
-      <Table striped highlightOnHover withTableBorder>
-        <Table.Thead>
-          <Table.Tr>
-            <Table.Th>Deck</Table.Th>
-            <Table.Th></Table.Th>
-          </Table.Tr>
-        </Table.Thead>
-
+      <h2>My Decks</h2>
+      <Table highlightOnHover withRowBorders={false}>
         <Table.Tbody>
+
           {rows}
 
           <Table.Tr>
-
             <Table.Td>
               <TextInput
                 placeholder="New deck label"
@@ -153,10 +136,11 @@ function DeckBrowser() {
             <Table.Td>
               <Button
                 type="submit"
-                onClick={() => deckCreate()}>
+                leftSection={<IconCirclePlus />}
+                onClick={deckCreate}
+              >
                 Create
               </Button>
-
             </Table.Td>
           </Table.Tr>
 
