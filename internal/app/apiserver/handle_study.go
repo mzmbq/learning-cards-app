@@ -43,6 +43,10 @@ func (s *server) handleStudyGetCard() http.HandlerFunc {
 			log.Println(err)
 			return
 		}
+		if len(cards) == 0 {
+			http.Error(w, "", http.StatusNoContent)
+			return
+		}
 		sort.Slice(cards, func(i, j int) bool {
 			return cards[i].Flashcard.Due.Before(cards[j].Flashcard.Due)
 		})
