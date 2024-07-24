@@ -2,6 +2,7 @@
 FROM node:16 AS build
 WORKDIR /app
 COPY frontend .
+COPY .env /.env
 
 RUN npm install
 RUN npm run build
