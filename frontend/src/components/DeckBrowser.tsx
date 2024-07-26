@@ -125,27 +125,25 @@ function DeckBrowser() {
 
           {rows}
 
-          <Table.Tr>
-            <Table.Td>
-              <TextInput
-                placeholder="New deck label"
-                value={formInput}
-                onChange={(event) => setFormInput(event.currentTarget.value)}
-              />
-            </Table.Td>
-            <Table.Td>
-              <Button
-                type="submit"
-                leftSection={<IconCirclePlus />}
-                onClick={deckCreate}
-              >
-                Create
-              </Button>
-            </Table.Td>
-          </Table.Tr>
 
         </Table.Tbody>
       </Table>
+
+      <h3>Create a new deck</h3>
+      <Group >
+        <TextInput
+          placeholder="New deck label"
+          value={formInput}
+          onChange={(event) => setFormInput(event.currentTarget.value)}
+        />
+        <Button
+          type="submit"
+          leftSection={<IconCirclePlus />}
+          onClick={deckCreate}
+        >
+          Create
+        </Button>
+      </Group>
 
 
     </Container>
