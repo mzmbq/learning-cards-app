@@ -53,7 +53,26 @@ func newServer(store store.Store, sessionsStore sessions.Store, CORSOrigins []st
 
 	s.routes()
 
+	go s.cleanupOldClients()
+
 	return s
+}
+
+// Deletes rate limiters for clients that haven't been seen for 5 minutes
+func (s *server) cleanupOldClients() {
+
+	for {
+		time.Sleep(1 * time.Minute)
+
+		s.clientsMutex.Lock()
+		// Delete rate limiter if client hasn't been seen for 5 minutes
+		for ip, c := range s.clients {
+			if time.Since(c.lastSeen) > 5*time.Minute {
+				delete(s.clients, ip)
+			}
+		}
+		s.clientsMutex.Unlock()
+	}
 }
 
 func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
