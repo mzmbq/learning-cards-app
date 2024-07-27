@@ -11,6 +11,7 @@ import (
 	"github.com/gorilla/sessions"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/mzmbq/learning-cards-app/backend/internal/app/store/sqlstore"
+	"golang.org/x/time/rate"
 )
 
 func Start(config *Config) error {
@@ -27,7 +28,18 @@ func Start(config *Config) error {
 	}
 	sessionStore := sessions.NewCookieStore(sessionKey)
 
-	srv := newServer(store, sessionStore, config.CORSOrigins, config.RateLimit)
+	var globalLimiter *rate.Limiter = nil
+	if config.GlobaRatelLimit.Enabled {
+		globalLimiter = rate.NewLimiter(rate.Limit(config.GlobaRatelLimit.Rps), config.GlobaRatelLimit.Burst)
+	}
+
+	var userLimiter *rate.Limiter = nil
+	if config.GlobaRatelLimit.Enabled {
+		log.Println("IP-based Rate Limiting is enabled")
+		userLimiter = rate.NewLimiter(rate.Limit(config.UserRateLimit.Rps), config.UserRateLimit.Burst)
+	}
+
+	srv := newServer(store, sessionStore, config.CORSOrigins, globalLimiter, userLimiter)
 
 	return http.ListenAndServe(config.BindAddr, srv)
 }

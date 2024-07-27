@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"sync"
+	"time"
 
 	"github.com/gorilla/sessions"
 	"golang.org/x/time/rate"
@@ -25,17 +27,28 @@ type server struct {
 
 	middlewares []Middleware
 	// allowed origins for CORS
-	corsOrigins []string
-	rateLimiter *rate.Limiter
+	CORSOrigins []string
+	// rate limiting
+	globalLimiter *rate.Limiter
+	userLimiter   *rate.Limiter
+	clients       map[string]*client
+	clientsMutex  sync.Mutex
 }
 
-func newServer(store store.Store, sessionsStore sessions.Store, corsOrigins []string, rateLimit int) *server {
+type client struct {
+	limiter  *rate.Limiter
+	lastSeen time.Time
+}
+
+func newServer(store store.Store, sessionsStore sessions.Store, CORSOrigins []string, globalLimiter *rate.Limiter, userLimiter *rate.Limiter) *server {
 	s := &server{
 		mux:           http.NewServeMux(),
 		store:         store,
 		sessionsStore: sessionsStore,
-		corsOrigins:   corsOrigins,
-		rateLimiter:   rate.NewLimiter(rate.Limit(rateLimit), rateLimit),
+		CORSOrigins:   CORSOrigins,
+		globalLimiter: globalLimiter,
+		userLimiter:   userLimiter,
+		clients:       make(map[string]*client),
 	}
 
 	s.routes()
