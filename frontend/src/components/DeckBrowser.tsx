@@ -1,11 +1,10 @@
-import { ActionIcon, Button, Container, Group, LoadingOverlay, Table, Text, TextInput } from "@mantine/core";
+import { Button, Container, Group, LoadingOverlay, Table, TextInput } from "@mantine/core";
 import { useEffect, useState } from "react";
 import CONFIG from "../config";
-import { Link, useNavigate } from "react-router-dom";
 
 import { Deck } from "../types";
 import ErrorPage from "./ErrorPage";
-import { IconCards, IconCirclePlus, IconCirclePlus2, IconListSearch, IconPlus, IconTrash } from "@tabler/icons-react";
+import { IconCirclePlus, } from "@tabler/icons-react";
 import DeckBrowserRow from "./DeckBrowserRow";
 
 type DeckCreateReqBody = {
@@ -23,7 +22,6 @@ function DeckBrowser() {
 
   const fetchDecks = async () => {
     setLoading(true);
-
     try {
       const response = await fetch(`${CONFIG.backendURL}/api/decks/list`, {
         method: "GET",
@@ -38,10 +36,12 @@ function DeckBrowser() {
 
       }
       const data = await response.json();
+
+      // Sort decks by id before setting the state
+      data.decks.sort((a: Deck, b: Deck) => a.id! - b.id!);
       setDecks(data.decks);
 
     } catch (error: any) {
-
       console.error(error);
       setError(error.message);
 
@@ -52,7 +52,6 @@ function DeckBrowser() {
 
   const deckCreate = async () => {
     setLoading(true);
-
     try {
       const body: DeckCreateReqBody = {
         deckName: formInput
@@ -81,7 +80,6 @@ function DeckBrowser() {
 
   const deckDelete = async (id: number) => {
     setLoading(true);
-
     try {
       const response = await fetch(`${CONFIG.backendURL}/api/deck/delete/${id}`, {
         method: "GET",
@@ -102,13 +100,36 @@ function DeckBrowser() {
     }
   };
 
+  const deckRename = async (id: number, deckname: string) => {
+    setLoading(true);
+    try {
+      const respoonse = await fetch(`${CONFIG.backendURL}/api/deck/rename/${id}`, {
+        method: "POST",
+        credentials: "include",
+        body: JSON.stringify({ deckname: deckname }),
+      });
+
+      if (!respoonse.ok) {
+        throw new Error(`Failed to rename a deck. id: ${id}`);
+      }
+      await fetchDecks();
+
+    } catch (error: any) {
+      console.error(error);
+      setError(error.message);
+
+    } finally {
+      setLoading(false);
+    }
+  };
+
 
   useEffect(() => {
     fetchDecks();
   }, []);
 
   const rows = decks.map((d) => (
-    <DeckBrowserRow key={d.id} deck={d} deckDelete={deckDelete} />
+    <DeckBrowserRow key={d.id} deck={d} deckDelete={deckDelete} deckRename={deckRename} />
   ));
 
   if (error) {
@@ -120,14 +141,15 @@ function DeckBrowser() {
       <LoadingOverlay visible={loading} />
 
       <h2>My Decks</h2>
-      <Table highlightOnHover withRowBorders={false}>
-        <Table.Tbody>
 
-          {rows}
+      <Group
+        gap="md"
+      >
+        {rows}
+
+      </Group>
 
 
-        </Table.Tbody>
-      </Table>
 
       <h3>Create a new deck</h3>
       <Group >

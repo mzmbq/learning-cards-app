@@ -1,66 +1,82 @@
 import React from 'react';
 import { Deck } from '../types';
-import { Button, Group, Table, Text } from '@mantine/core';
-import { IconCards, IconListSearch, IconTrash } from '@tabler/icons-react';
+import { ActionIcon, Button, Card, Group, Menu, rem, Stack, Table, Text, TextInput } from '@mantine/core';
+import { IconCards, IconEdit, IconListSearch, IconSettings, IconTrash, IconWheel } from '@tabler/icons-react';
 import { useNavigate } from 'react-router-dom';
 
 type Props = {
   deck: Deck;
   deckDelete: (deckId: number) => void;
+  deckRename: (deckId: number, deckname: string) => void;
 };
 
-function DeckBrowserRow({ deck, deckDelete }: Props) {
+function DeckBrowserRow({ deck, deckDelete, deckRename }: Props) {
   const navigate = useNavigate();
-  const [visible, setVisible] = React.useState(false);
+  const [renaming, setRenaming] = React.useState(false);
+  const [newName, setNewName] = React.useState(deck.name);
 
   return (
-    <Table.Tr
-      key={deck.id}
-      onMouseEnter={() => setVisible(true)}
-      onMouseLeave={() => setVisible(false)}>
-      <Table.Td
-        onClick={() => console.log("hello")}>
-        {/* <Link to={`/study/${d.id}`}> */}
-        <Text size="lg">
-          {deck.name}
-        </Text>
-        {/* </Link> */}
-      </Table.Td>
-      <Table.Td>
-        {visible &&
-          <Group justify="right" gap="xs">
+    // <Table.Tr
+    <Card shadow="sm" padding="lg" radius="md" withBorder>
+      <Card.Section>
+      </Card.Section>
 
-            <Button
-              size="sm"
-              color="lime"
-              leftSection={<IconCards />}
-              onClick={() => navigate(`/study/${deck.id}`)}>
-              Study
-            </Button>
+      <Group justify="space-between" mt="md" mb="xs">
+        {renaming &&
+          <TextInput
+            value={newName}
+            onChange={(event) => setNewName(event.currentTarget.value)}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter') {
+                deckRename(deck.id!, newName);
+                setRenaming(false);
+              }
+            }}
 
-            <Button
-              size="sm"
-              color="yellow"
+          />}
+        {!renaming && <Text>{deck.name}</Text>}
+
+        <Menu>
+          <Menu.Target>
+            <ActionIcon variant="subtle" color="gray">
+              <IconSettings style={{ width: rem(16), height: rem(16) }} />
+            </ActionIcon>
+          </Menu.Target>
+
+          <Menu.Dropdown>
+            <Menu.Item
+              leftSection={<IconEdit />}
+              onClick={() => setRenaming(!renaming)}
+            >
+              Rename
+            </Menu.Item>
+            <Menu.Item
               leftSection={<IconListSearch />}
               onClick={() => navigate(`/deck/${deck.id}`)}
             >
               Browse
-            </ Button>
-
-
-            <Button
-              size="sm"
-              color="red"
+            </Menu.Item>
+            <Menu.Divider />
+            <Menu.Item
               leftSection={<IconTrash />}
+              color="red"
               onClick={() => deckDelete(deck.id!)}
             >
               Delete
-            </ Button>
+            </Menu.Item>
+          </Menu.Dropdown>
+        </Menu>
+      </Group>
 
-          </Group>
-        }
-      </Table.Td>
-    </Table.Tr >
+      <Button
+        size="sm"
+        color="lime"
+        leftSection={<IconCards />}
+        onClick={() => navigate(`/study/${deck.id}`)}>
+        Study
+      </Button>
+
+    </Card>
   );
 }
 
