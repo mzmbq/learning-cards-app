@@ -171,6 +171,23 @@ func (r *DeckRepository) Delete(id int) error {
 }
 
 func (r *DeckRepository) Update(deck *model.Deck) error {
+	res, err := r.store.db.Exec("UPDATE decks SET name = $1, user_id = $2 WHERE id = $3",
+		deck.Name,
+		deck.UserID,
+		deck.ID,
+	)
+	if err != nil {
+		return err
+	}
+	count, err := res.RowsAffected()
+	if err != nil {
+		log.Println("rowsAffected not supported by driver")
+		return err
+	}
+
+	if count == 0 {
+		return store.ErrRecordNotFound
+	}
 
 	return nil
 }

@@ -166,3 +166,59 @@ func (s *server) handleDecksList() http.HandlerFunc {
 	}
 
 }
+
+func (s *server) handleDeckRename() http.HandlerFunc {
+	type request struct {
+		DeckName string `json:"deckname"`
+	}
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		u, err := s.userFromRequest(r)
+		if err != nil {
+			http.Error(w, "", http.StatusInternalServerError)
+			return
+		}
+		req := request{}
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			http.Error(w, "", http.StatusInternalServerError)
+			return
+		}
+		if req.DeckName == "" {
+			http.Error(w, "", http.StatusBadRequest)
+			return
+		}
+
+		idStr := r.PathValue("id")
+		if idStr == "" {
+			http.Error(w, "no deck with id: "+idStr, http.StatusInternalServerError)
+			log.Println(err)
+			return
+		}
+
+		id, err := strconv.Atoi(idStr)
+		if err != nil {
+			http.Error(w, "invalid deck id", http.StatusBadRequest)
+			log.Println(err)
+			return
+		}
+
+		d, err := s.store.Deck().Find(id)
+		if err != nil {
+			http.Error(w, "", http.StatusInternalServerError)
+			return
+		}
+		if d.UserID != u.ID {
+			http.Error(w, "", http.StatusUnauthorized)
+			return
+		}
+
+		// Rename the deck
+		d.Name = req.DeckName
+		err = s.store.Deck().Update(d)
+		if err != nil {
+			http.Error(w, "", http.StatusInternalServerError)
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+	}
+}

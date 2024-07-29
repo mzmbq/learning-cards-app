@@ -14,6 +14,7 @@ func (s *server) routes() {
 	s.Handle("POST /api/deck/create", s.handleDeckCreate())
 	s.Handle("GET /api/deck/delete/{id}", s.handleDeckDelete())
 	s.Handle("GET /api/deck/list-cards/{id}", s.handleDeckListCards())
+	s.Handle("POST /api/deck/rename/{id}", s.handleDeckRename())
 
 	s.Handle("POST /api/card/create", s.handleCardCreate())
 	s.Handle("POST /api/card/update/{id}", s.handleCardUpdate())
