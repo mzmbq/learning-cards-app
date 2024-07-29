@@ -1,7 +1,7 @@
 import React from 'react';
 import { Deck } from '../types';
-import { ActionIcon, Button, Card, Group, Menu, rem, Stack, Table, Text, TextInput } from '@mantine/core';
-import { IconCards, IconEdit, IconListSearch, IconSettings, IconTrash, IconWheel } from '@tabler/icons-react';
+import { ActionIcon, Button, Card, Group, Menu, rem, Stack, Text, TextInput } from '@mantine/core';
+import { IconCards, IconEdit, IconListSearch, IconSettings, IconTrash } from '@tabler/icons-react';
 import { useNavigate } from 'react-router-dom';
 
 type Props = {
@@ -21,60 +21,63 @@ function DeckBrowserRow({ deck, deckDelete, deckRename }: Props) {
       <Card.Section>
       </Card.Section>
 
-      <Group justify="space-between" mt="md" mb="xs">
-        {renaming &&
-          <TextInput
-            value={newName}
-            onChange={(event) => setNewName(event.currentTarget.value)}
-            onKeyDown={(event) => {
-              if (event.key === 'Enter') {
-                deckRename(deck.id!, newName);
-                setRenaming(false);
-              }
-            }}
+      <Stack gap="xs">
 
-          />}
-        {!renaming && <Text>{deck.name}</Text>}
+        <Group justify="space-between" mt="md" mb="xs">
+          {renaming &&
+            <TextInput
+              value={newName}
+              onChange={(event) => setNewName(event.currentTarget.value)}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter') {
+                  deckRename(deck.id!, newName);
+                  setRenaming(false);
+                }
+              }}
 
-        <Menu>
-          <Menu.Target>
-            <ActionIcon variant="subtle" color="gray">
-              <IconSettings style={{ width: rem(16), height: rem(16) }} />
-            </ActionIcon>
-          </Menu.Target>
+            />}
+          {!renaming && <Text>{deck.name}</Text>}
 
-          <Menu.Dropdown>
-            <Menu.Item
-              leftSection={<IconEdit />}
-              onClick={() => setRenaming(!renaming)}
-            >
-              Rename
-            </Menu.Item>
-            <Menu.Item
-              leftSection={<IconListSearch />}
-              onClick={() => navigate(`/deck/${deck.id}`)}
-            >
-              Browse
-            </Menu.Item>
-            <Menu.Divider />
-            <Menu.Item
-              leftSection={<IconTrash />}
-              color="red"
-              onClick={() => deckDelete(deck.id!)}
-            >
-              Delete
-            </Menu.Item>
-          </Menu.Dropdown>
-        </Menu>
-      </Group>
+          <Menu>
+            <Menu.Target>
+              <ActionIcon variant="subtle" color="gray">
+                <IconSettings style={{ width: rem(16), height: rem(16) }} />
+              </ActionIcon>
+            </Menu.Target>
 
-      <Button
-        size="sm"
-        color="lime"
-        leftSection={<IconCards />}
-        onClick={() => navigate(`/study/${deck.id}`)}>
-        Study
-      </Button>
+            <Menu.Dropdown>
+              <Menu.Item
+                leftSection={<IconEdit />}
+                onClick={() => setRenaming(!renaming)}
+              >
+                Rename
+              </Menu.Item>
+              <Menu.Item
+                leftSection={<IconListSearch />}
+                onClick={() => navigate(`/deck/${deck.id}`)}
+              >
+                Browse
+              </Menu.Item>
+              <Menu.Divider />
+              <Menu.Item
+                leftSection={<IconTrash />}
+                color="red"
+                onClick={() => deckDelete(deck.id!)}
+              >
+                Delete
+              </Menu.Item>
+            </Menu.Dropdown>
+          </Menu>
+        </Group>
+
+        <Button
+          size="sm"
+          color="lime"
+          leftSection={<IconCards />}
+          onClick={() => navigate(`/study/${deck.id}`)}>
+          Study
+        </Button>
+      </Stack>
 
     </Card>
   );

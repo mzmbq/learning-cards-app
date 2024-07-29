@@ -1,4 +1,4 @@
-import { Button, Container, Group, LoadingOverlay, Table, TextInput } from "@mantine/core";
+import { Button, Card, Container, Group, LoadingOverlay, Stack, TextInput } from "@mantine/core";
 import { useEffect, useState } from "react";
 import CONFIG from "../config";
 
@@ -64,7 +64,7 @@ function DeckBrowser() {
       });
 
       if (!response.ok) {
-        throw new Error(`Failed to create a deck ${formInput}`);
+        throw new Error(`Failed to create a deck ${body.deckName}`);
       }
       await fetchDecks();
       setFormInput("");
@@ -147,28 +147,37 @@ function DeckBrowser() {
       >
         {rows}
 
-      </Group>
+        <Card shadow="sm" padding="lg" radius="md" withBorder>
+          <Card.Section>
+          </Card.Section>
 
+          <Stack gap="xs">
+            <Group justify="space-between" mt="md" mb="xs">
+              <TextInput
+                placeholder="New deck label"
+                value={formInput}
+                onChange={(event) => setFormInput(event.currentTarget.value)}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter') {
+                    deckCreate();
+                  }
+                }}
+              />
+            </Group>
 
+            <Button
+              leftSection={<IconCirclePlus />}
+              onClick={deckCreate}
+            >
+              Create
+            </Button>
+          </Stack>
 
-      <h3>Create a new deck</h3>
-      <Group >
-        <TextInput
-          placeholder="New deck label"
-          value={formInput}
-          onChange={(event) => setFormInput(event.currentTarget.value)}
-        />
-        <Button
-          type="submit"
-          leftSection={<IconCirclePlus />}
-          onClick={deckCreate}
-        >
-          Create
-        </Button>
-      </Group>
+        </Card>
 
+      </Group >
 
-    </Container>
+    </Container >
   );
 }
 
