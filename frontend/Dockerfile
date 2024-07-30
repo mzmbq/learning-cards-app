@@ -1,10 +1,12 @@
 # Frontend Dockerfile
 FROM node:16 AS build
 WORKDIR /app
-COPY frontend .
-COPY .env /.env
 
+COPY frontend/package*.json .
+COPY .env /.env
 RUN npm install
+
+COPY frontend .
 RUN npm run build
 
 FROM nginx:alpine
