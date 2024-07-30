@@ -4,7 +4,7 @@ import CONFIG from "../config";
 
 import { Deck } from "../types";
 import ErrorPage from "./ErrorPage";
-import { IconCirclePlus, } from "@tabler/icons-react";
+import { IconPencilPlus, } from "@tabler/icons-react";
 import DeckBrowserRow from "./DeckBrowserRow";
 
 type DeckCreateReqBody = {
@@ -166,7 +166,7 @@ function DeckBrowser() {
             </Group>
 
             <Button
-              leftSection={<IconCirclePlus />}
+              leftSection={<IconPencilPlus />}
               onClick={deckCreate}
             >
               Create

@@ -10,6 +10,14 @@ export type Card = {
   back: string;
 
   deck_id: number;
+
+  flashcard?: {
+    ease: number;
+    interval: number;
+    state: number;
+    step: number;
+    due: Date;
+  };
 };
 
 export type DictionaryEntry = {

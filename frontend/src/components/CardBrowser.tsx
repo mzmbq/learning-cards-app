@@ -6,12 +6,26 @@ import { useNavigate, useParams } from "react-router-dom";
 
 import classes from "./CardBrowser.module.css";
 import ErrorPage from "./ErrorPage";
+import moment from "moment-timezone";
 
-type Card = {
-  id: number;
-  front: string;
-  back: string;
-  deck_id: number;
+import { Card } from "../types";
+
+const formatDate = (date: Date) => {
+  const m = moment(date).tz(moment.tz.guess());
+
+  if (m.isBefore(moment().add(5, "minute"))) {
+    return "Now";
+  }
+  if (m.day() === moment().day()) {
+    return "Today, " + m.format("hh:mm");
+  }
+  if (m.day() === moment().day() + 1) {
+    return "Tomorrow, " + m.format("hh:mm");
+  }
+  if (m.year() === moment().year()) {
+    return m.format("DD MMM, hh:mm");
+  }
+  return m.format("DD MMM YYYY, hh:mm");
 };
 
 function CardBrowser() {
@@ -23,10 +37,14 @@ function CardBrowser() {
 
   const deckID = Number(useParams().id);
 
+  // Sort cards by due date
+  cards.sort((a: Card, b: Card) => moment(a.flashcard!.due).diff(moment(b.flashcard!.due)));
+
   const rows = cards.map((card: Card) => (
     <Table.Tr key={card.id}>
       <Table.Td>{card.front}</Table.Td>
       <Table.Td>{card.back}</Table.Td>
+      <Table.Td>{formatDate(card.flashcard!.due)}</Table.Td>
     </Table.Tr>
   ));
 
@@ -79,6 +97,7 @@ function CardBrowser() {
             <Table.Tr>
               <Table.Th>Front</Table.Th>
               <Table.Th>Back</Table.Th>
+              <Table.Th>Due Date</Table.Th>
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>
