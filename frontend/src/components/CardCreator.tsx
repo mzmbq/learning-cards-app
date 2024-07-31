@@ -1,21 +1,24 @@
 import { Button, Container, LoadingOverlay, Textarea } from "@mantine/core";
-import classes from "./NewCard.module.css";
+import classes from "./CardCreator.module.css";
 import { useEffect, useRef, useState } from "react";
 
-import { Card, Deck } from "../types";
+import { Card, Deck, DictionaryEntry } from "../types";
 import CONFIG from "../config";
-import { Link, useParams } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
 import ErrorPage from "./ErrorPage";
 import { useHotkeys } from "@mantine/hooks";
 
 
-
 function CardCreator() {
+  const location = useLocation();
+  const entry: DictionaryEntry = location.state?.entry ?? undefined;
+
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [currentDeck, setCurrentDeck] = useState<Deck | null>(null);
-  const [front, setFront] = useState("");
-  const [back, setBack] = useState("");
+  const [front, setFront] = useState(entry === undefined ? "" : entry.definition + "\n" + entry.examples?.join("\n"));
+  const [back, setBack] = useState(entry === undefined ? "" : entry.word);
+
 
   const fronInputRef = useRef<HTMLTextAreaElement | null>(null);
 

@@ -5,6 +5,8 @@ import CONFIG from '../config';
 import { IconSearch } from '@tabler/icons-react';
 import { DictionaryEntry } from '../types';
 import SearchResult from './SearchResult';
+import { useNavigate } from 'react-router-dom';
+import { useUserContext } from '../context/UserContext';
 
 type SuggestionsResponse = {
   suggestions: string[];
@@ -32,6 +34,9 @@ export default function SearchPage() {
   const [selectedDict, setSelectedDict] = useState<string | null>(dictionalries[0]);
   const [entries, setEntries] = useState<DictionaryEntry[]>([]);
   const [searchPerformed, setSearchPerformed] = useState(false);
+  const [user, setUser] = useUserContext();
+
+  const navigate = useNavigate();
 
   const fetchSuggestions = async () => {
     if (formInput === "") {
@@ -127,7 +132,13 @@ export default function SearchPage() {
       {searchPerformed && <p>{entries.length} Results</p>}
       {searchPerformed && !entries && <h3>No Results</h3>}
       {searchPerformed && entries.map((entry, index) => (
-        <SearchResult key={index} entry={entry} onPress={() => { }} />
+        <SearchResult
+          key={index}
+          entry={entry}
+          onPress={() => {
+            // TODO: get the current deck from the user context?
+            navigate("/new-card/1", { state: { entry } });
+          }} />
       ))}
 
 
