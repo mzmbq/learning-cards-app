@@ -82,6 +82,7 @@ func answerGood(fc *model.Flashcard) {
 	case model.StateReview:
 		// Ease unchanged
 		fc.Interval = time.Duration(float64(fc.Interval) * fc.Ease)
+		fc.Due = time.Now().Add(fc.Interval)
 
 	}
 }
