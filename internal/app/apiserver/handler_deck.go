@@ -35,6 +35,12 @@ func (s *server) handleDeckCreate() http.HandlerFunc {
 			UserID: u.ID,
 		}
 
+		if err := d.Validate(); err != nil {
+			http.Error(w, "invalid json payload", http.StatusBadRequest)
+			log.Println("deck validation failed for deck: ", d, " error: ", err)
+			return
+		}
+
 		if err = s.store.Deck().Create(&d); err != nil {
 			http.Error(w, "", http.StatusBadRequest)
 			return

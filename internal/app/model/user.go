@@ -1,12 +1,18 @@
 package model
 
-import "golang.org/x/crypto/bcrypt"
+import (
+	"golang.org/x/crypto/bcrypt"
+)
 
 type User struct {
 	ID                int    `json:"id"`
-	Email             string `json:"email"`
-	Password          string `json:"password,omitempty"`
+	Email             string `json:"email" validate:"required,email"`
+	Password          string `json:"password,omitempty" validate:"required,min=6"`
 	EncryptedPassword string `json:"-"`
+}
+
+func (u *User) Validate() error {
+	return validate.Struct(u)
 }
 
 func (u *User) Sanitize() {

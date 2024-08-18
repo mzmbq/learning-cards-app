@@ -4,8 +4,8 @@ import "time"
 
 type Card struct {
 	ID     int    `json:"id"`
-	Front  string `json:"front"`
-	Back   string `json:"back"`
+	Front  string `json:"front" validate:"required,min=3,max=1000"`
+	Back   string `json:"back" validate:"required,min=3,max=1000"`
 	DeckID int    `json:"deck_id"`
 
 	Flashcard Flashcard `json:"flashcard"`

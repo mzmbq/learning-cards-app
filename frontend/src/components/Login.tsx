@@ -28,7 +28,7 @@ function Login() {
 
     validate: {
       email: (value) => (/^\S+@\S+$/.test(value) ? null : "Invalid email"),
-      password: (value) => (value.length >= 0 ? null : "Password is too short"),
+      password: (value) => (value.length >= 6 ? null : "Password is too short"),
     },
   });
 

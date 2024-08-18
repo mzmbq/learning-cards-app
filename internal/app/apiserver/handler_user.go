@@ -28,6 +28,12 @@ func (s *server) handleUserCreate() http.HandlerFunc {
 			Password: req.Password,
 		}
 
+		if err := u.Validate(); err != nil {
+			http.Error(w, "invalid json payload", http.StatusBadRequest)
+			log.Println("user validation failed for user: ", u, " error: ", err)
+			return
+		}
+
 		uFound, err := s.store.User().FindByEmail(req.Email)
 		if err != nil && err != store.ErrRecordNotFound {
 			http.Error(w, "", http.StatusInternalServerError)

@@ -25,6 +25,7 @@ function SignUp() {
 
     validate: {
       email: (value) => (/^\S+@\S+$/.test(value) ? null : "Invalid email"),
+      password: (value) => (value.length >= 6 ? null : "Password is too short"),
     },
   });
 
