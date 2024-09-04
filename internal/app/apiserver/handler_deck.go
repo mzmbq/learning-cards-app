@@ -189,18 +189,9 @@ func (s *server) handleDeckRename() http.HandlerFunc {
 			http.Error(w, "", http.StatusInternalServerError)
 			return
 		}
-		if req.DeckName == "" {
-			http.Error(w, "", http.StatusBadRequest)
-			return
-		}
 
+		// Extract the deck id from the request path
 		idStr := r.PathValue("id")
-		if idStr == "" {
-			http.Error(w, "no deck with id: "+idStr, http.StatusInternalServerError)
-			log.Println(err)
-			return
-		}
-
 		id, err := strconv.Atoi(idStr)
 		if err != nil {
 			http.Error(w, "invalid deck id", http.StatusBadRequest)
@@ -218,8 +209,15 @@ func (s *server) handleDeckRename() http.HandlerFunc {
 			return
 		}
 
-		// Rename the deck
+		// Validate the new deck name
 		d.Name = req.DeckName
+		if err := d.Validate(); err != nil {
+			http.Error(w, "invalid json payload", http.StatusBadRequest)
+			log.Println("deck validation failed for deck: ", d, " error: ", err)
+			return
+		}
+
+		// Rename the deck
 		err = s.store.Deck().Update(d)
 		if err != nil {
 			http.Error(w, "", http.StatusInternalServerError)
