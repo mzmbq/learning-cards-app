@@ -1,5 +1,5 @@
 import { Button, List } from "@mantine/core";
-import { DictionaryEntry } from "../types";
+import { DictionaryEntry } from "../../types";
 import classes from "./SearchResult.module.css";
 
 type Props = {
@@ -23,15 +23,15 @@ function SearchResult({ entry, onPress }: Props) {
     <>
       <div className={classes.entry}>
         <p>{entry.definition}</p>
-        {examples !== undefined && examples.length !== 0 &&
+        {examples !== undefined && examples.length !== 0 && (
           <>
-            <List>
-              {examples}
-            </List>
+            <List>{examples}</List>
           </>
-        }
+        )}
       </div>
-      <Button className={classes.button} onClick={onPress}>Add to Deck</Button>
+      <Button className={classes.button} onClick={onPress}>
+        Add to Deck
+      </Button>
     </>
   );
 }

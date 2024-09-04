@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 
-import CONFIG from "../config";
+import CONFIG from "../../config";
 import { Button, Container, LoadingOverlay, Table } from "@mantine/core";
 import { useNavigate, useParams } from "react-router-dom";
 
 import classes from "./CardBrowser.module.css";
-import ErrorPage from "./ErrorPage";
+import ErrorPage from "../Error/ErrorPage";
 import moment from "moment-timezone";
 
-import { Card } from "../types";
+import { Card } from "../../types";
 
 const formatDate = (date: Date) => {
   const m = moment(date).tz(moment.tz.guess());
@@ -38,7 +38,9 @@ function CardBrowser() {
   const deckID = Number(useParams().id);
 
   // Sort cards by due date
-  cards.sort((a: Card, b: Card) => moment(a.flashcard!.due).diff(moment(b.flashcard!.due)));
+  cards.sort((a: Card, b: Card) =>
+    moment(a.flashcard!.due).diff(moment(b.flashcard!.due))
+  );
 
   const rows = cards.map((card: Card) => (
     <Table.Tr key={card.id}>
@@ -56,10 +58,13 @@ function CardBrowser() {
         throw new Error("invalid deck id");
       }
 
-      const response = await fetch(`${CONFIG.backendURL}/api/deck/list-cards/${deckID}`, {
-        method: "GET",
-        credentials: "include",
-      });
+      const response = await fetch(
+        `${CONFIG.backendURL}/api/deck/list-cards/${deckID}`,
+        {
+          method: "GET",
+          credentials: "include",
+        }
+      );
 
       if (!response.ok) {
         throw new Error("failed to fetch cards");
@@ -67,11 +72,9 @@ function CardBrowser() {
 
       const data = await response.json();
       setCards(data.cards);
-
     } catch (error: any) {
       console.error(error);
       setError(error.message);
-
     } finally {
       setLoading(false);
     }
@@ -100,16 +103,19 @@ function CardBrowser() {
               <Table.Th>Due Date</Table.Th>
             </Table.Tr>
           </Table.Thead>
-          <Table.Tbody>
-            {rows}
-          </Table.Tbody>
+          <Table.Tbody>{rows}</Table.Tbody>
         </Table>
 
         <div className={classes.buttons}>
-          <Button onClick={() => { navigate(`/new-card/${deckID}`); }}>Add</Button>
+          <Button
+            onClick={() => {
+              navigate(`/new-card/${deckID}`);
+            }}
+          >
+            Add
+          </Button>
         </div>
       </div>
-
     </Container>
   );
 }

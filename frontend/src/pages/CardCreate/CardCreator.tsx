@@ -2,12 +2,11 @@ import { Button, Container, LoadingOverlay, Textarea } from "@mantine/core";
 import classes from "./CardCreator.module.css";
 import { useEffect, useRef, useState } from "react";
 
-import { Card, Deck, DictionaryEntry } from "../types";
-import CONFIG from "../config";
+import { Card, Deck, DictionaryEntry } from "../../types";
+import CONFIG from "../../config";
 import { Link, useLocation, useParams } from "react-router-dom";
-import ErrorPage from "./ErrorPage";
+import ErrorPage from "../Error/ErrorPage";
 import { useHotkeys } from "@mantine/hooks";
-
 
 function CardCreator() {
   const location = useLocation();
@@ -16,9 +15,12 @@ function CardCreator() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [currentDeck, setCurrentDeck] = useState<Deck | null>(null);
-  const [front, setFront] = useState(entry === undefined ? "" : entry.definition + "\n" + entry.examples?.join("\n"));
+  const [front, setFront] = useState(
+    entry === undefined
+      ? ""
+      : entry.definition + "\n" + entry.examples?.join("\n")
+  );
   const [back, setBack] = useState(entry === undefined ? "" : entry.word);
-
 
   const fronInputRef = useRef<HTMLTextAreaElement | null>(null);
 
@@ -74,18 +76,16 @@ function CardCreator() {
 
       // set current deck
       const decks: Deck[] = data.decks;
-      const deck = decks.find(d => d.id! === deckID);
+      const deck = decks.find((d) => d.id! === deckID);
 
       if (deck !== undefined) {
         setCurrentDeck(deck);
       } else {
         setError(`invalid deck id "${deckID}"`);
       }
-
     } catch (error: any) {
       console.error(error);
       setError(error.message);
-
     } finally {
       setLoading(false);
     }
@@ -106,22 +106,26 @@ function CardCreator() {
       setFront("");
       setBack("");
       await fetchCurrentDeck();
-
     } catch (error: any) {
       console.error(error);
       setError(error.message);
-
     } finally {
       setLoading(false);
     }
   };
 
-  useHotkeys([
-    ["ctrl+enter", () => {
-      cardCreate(card);
-      focusFront();
-    }],
-  ], []);
+  useHotkeys(
+    [
+      [
+        "ctrl+enter",
+        () => {
+          cardCreate(card);
+          focusFront();
+        },
+      ],
+    ],
+    []
+  );
 
   if (error) {
     return <ErrorPage message={error} />;
@@ -134,10 +138,8 @@ function CardCreator() {
       <h2>Create a new Card</h2>
 
       <div className={classes.outerContainer}>
-
         Current Deck:
         <Link to={`/deck/${currentDeck?.id}`}>{currentDeck?.name}</Link>
-
         <Textarea
           ref={fronInputRef}
           label="Front side"
@@ -145,25 +147,24 @@ function CardCreator() {
           minRows={3}
           maxRows={15}
           value={front}
-          onChange={event => { setFront(event.target.value); }}
+          onChange={(event) => {
+            setFront(event.target.value);
+          }}
         />
-
         <Textarea
-
           label="Back side"
           autosize
           minRows={3}
           maxRows={15}
           value={back}
-          onChange={event => { setBack(event.target.value); }}
-
+          onChange={(event) => {
+            setBack(event.target.value);
+          }}
         />
-
         <div className={classes.buttons}>
           <Button onClick={() => cardCreate(card)}>Create</Button>
         </div>
       </div>
-
     </Container>
   );
 }

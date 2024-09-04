@@ -1,8 +1,16 @@
-import { TextInput, Button, Group, Box, PasswordInput, LoadingOverlay, Modal } from "@mantine/core";
+import {
+  TextInput,
+  Button,
+  Group,
+  Box,
+  PasswordInput,
+  LoadingOverlay,
+  Modal,
+} from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { Link, useNavigate } from "react-router-dom";
 
-import CONFIG from "../config";
+import CONFIG from "../../config";
 import { useState } from "react";
 
 type SignUpFormValues = {
@@ -45,9 +53,7 @@ function SignUp() {
         throw new Error("Sign up failed");
       }
 
-
       navigate("/login");
-
     } catch (error: any) {
       console.error(error);
       setError(error.message);
@@ -62,9 +68,16 @@ function SignUp() {
     <Box maw={340} mx="auto">
       <LoadingOverlay visible={isLoading} />
 
-      {error &&
-        <Modal opened={true} onClose={() => { setError(null); }} withCloseButton={true} title={error} />}
-
+      {error && (
+        <Modal
+          opened={true}
+          onClose={() => {
+            setError(null);
+          }}
+          withCloseButton={true}
+          title={error}
+        />
+      )}
 
       <h2>Create an account</h2>
 
@@ -88,7 +101,9 @@ function SignUp() {
         </Group>
       </form>
 
-      <p>Already have an account? <Link to="/login">Log in</Link></p>
+      <p>
+        Already have an account? <Link to="/login">Log in</Link>
+      </p>
     </Box>
   );
 }

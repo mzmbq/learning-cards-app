@@ -3,9 +3,9 @@ import { useCallback, useEffect, useState } from "react";
 
 import classes from "./StudyPage.module.css";
 import { useParams } from "react-router-dom";
-import ErrorPage from "./ErrorPage";
-import { Card } from "../types";
-import CONFIG from "../config";
+import ErrorPage from "../Error/ErrorPage";
+import { Card } from "../../types";
+import CONFIG from "../../config";
 
 enum Status {
   Again = 0,
@@ -25,7 +25,6 @@ function StudyPage() {
 
   const deckIDStr = useParams().deck_id;
 
-
   const fetchCard = useCallback(async () => {
     if (deckIDStr === undefined) {
       setError("deck id is undefined");
@@ -40,10 +39,13 @@ function StudyPage() {
     try {
       setLoading(true);
 
-      const response = await fetch(`${CONFIG.backendURL}/api/study/get-card/${deckID}`, {
-        method: "GET",
-        credentials: "include",
-      });
+      const response = await fetch(
+        `${CONFIG.backendURL}/api/study/get-card/${deckID}`,
+        {
+          method: "GET",
+          credentials: "include",
+        }
+      );
 
       if (response.status === statusNoContent) {
         setNoCardsLeft(true);
@@ -56,7 +58,6 @@ function StudyPage() {
 
       const data = await response.json();
       setCard(data.card);
-
     } catch (error: any) {
       console.error(error);
       setError(error.message);
@@ -65,19 +66,22 @@ function StudyPage() {
     }
   }, [deckIDStr]);
 
-  useEffect(
-    () => { fetchCard(); },
-    [fetchCard]);
+  useEffect(() => {
+    fetchCard();
+  }, [fetchCard]);
 
   const submitCard = async (status: Status) => {
     try {
       setLoading(true);
 
-      const response = await fetch(`${CONFIG.backendURL}/api/study/submit/${card?.id}`, {
-        method: "POST",
-        credentials: "include",
-        body: JSON.stringify({ card_id: card?.id, status: status }),
-      });
+      const response = await fetch(
+        `${CONFIG.backendURL}/api/study/submit/${card?.id}`,
+        {
+          method: "POST",
+          credentials: "include",
+          body: JSON.stringify({ card_id: card?.id, status: status }),
+        }
+      );
 
       if (!response.ok) {
         throw new Error("failed to submit");
@@ -85,7 +89,6 @@ function StudyPage() {
 
       fetchCard();
       setbackVisible(false);
-
     } catch (error: any) {
       console.error(error);
       setError(error.message);
@@ -114,7 +117,6 @@ function StudyPage() {
       <h2>Study</h2>
 
       <div className={classes.cardContainer}>
-
         <div className={classes.cardFront}>
           <p>{card?.front}</p>
         </div>
@@ -123,19 +125,28 @@ function StudyPage() {
         </div>
 
         <div className={classes.buttons}>
-          {!backVisible && <Button onClick={() => setbackVisible(true)}>Show Answwer</Button>}
-          {backVisible &&
+          {!backVisible && (
+            <Button onClick={() => setbackVisible(true)}>Show Answwer</Button>
+          )}
+          {backVisible && (
             <>
-              <Button color="red" onClick={() => submitCard(Status.Again)}>Again</Button>
-              <Button color="grey" onClick={() => submitCard(Status.Hard)}>Hard</Button>
-              <Button color="green" onClick={() => submitCard(Status.Good)}>Good</Button>
-              <Button color="blue" onClick={() => submitCard(Status.Easy)}>Easy</Button>
+              <Button color="red" onClick={() => submitCard(Status.Again)}>
+                Again
+              </Button>
+              <Button color="grey" onClick={() => submitCard(Status.Hard)}>
+                Hard
+              </Button>
+              <Button color="green" onClick={() => submitCard(Status.Good)}>
+                Good
+              </Button>
+              <Button color="blue" onClick={() => submitCard(Status.Easy)}>
+                Easy
+              </Button>
             </>
-          }
+          )}
         </div>
       </div>
-
-    </Container >
+    </Container>
   );
 }
 

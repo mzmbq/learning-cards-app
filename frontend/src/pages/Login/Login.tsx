@@ -1,10 +1,18 @@
-import { TextInput, Button, Group, Box, PasswordInput, LoadingOverlay, Modal } from "@mantine/core";
+import {
+  TextInput,
+  Button,
+  Group,
+  Box,
+  PasswordInput,
+  LoadingOverlay,
+  Modal,
+} from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
-import CONFIG from "../config";
-import { useUserContext } from "../context/UserContext";
+import CONFIG from "../../config";
+import { useUserContext } from "../../context/UserContext";
 
 type LoginFormValues = {
   email: string;
@@ -50,7 +58,6 @@ function Login() {
 
       setSuccess(true);
       navigate("/decks");
-
     } catch (error: any) {
       console.error(error);
       setError(error.message);
@@ -63,8 +70,16 @@ function Login() {
     <Box maw={340} mx="auto">
       <LoadingOverlay visible={loading} />
 
-      {error &&
-        <Modal opened={true} onClose={() => { setError(null); }} withCloseButton={true} title={error} />}
+      {error && (
+        <Modal
+          opened={true}
+          onClose={() => {
+            setError(null);
+          }}
+          withCloseButton={true}
+          title={error}
+        />
+      )}
 
       <h2>Log in to your account</h2>
       <form onSubmit={form.onSubmit((values) => doAuth(values))}>
@@ -87,7 +102,9 @@ function Login() {
         </Group>
       </form>
 
-      <p>Don't have an account? <Link to="/signup">Create an account</Link></p>
+      <p>
+        Don't have an account? <Link to="/signup">Create an account</Link>
+      </p>
 
       {success && <p>Success!</p>}
     </Box>

@@ -8,12 +8,13 @@ services:
     ports:
       - "${DB_PORT}:5432"
     volumes:
-      - psql_volume:/var/lib/postgresql/data\
+      - psql_volume:/var/lib/postgresql/data
     healthcheck:
       test: pg_isready -U ${DB_USERNAME} -d ${DB_DATABASE}
       interval: 10s
       timeout: 3s
       retries: 5
+    restart: unless-stopped
 
   migrate:
     image: migrate/migrate

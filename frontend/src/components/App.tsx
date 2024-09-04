@@ -1,30 +1,35 @@
-import {
-  createBrowserRouter,
-  Outlet,
-  RouterProvider,
-} from "react-router-dom";
+import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
 
-import { createTheme, MantineProvider } from '@mantine/core';
+import { createTheme, MantineProvider } from "@mantine/core";
 
-import MainPage from './MainPage';
-import CardBrowser from './CardBrowser';
-import DeckBrowser from './DeckBrowser';
-import Header from './Header';
-import Login from './Login';
-import SignUp from './SignUp';
-import NotFoundPage from './NotFoundPage';
-import StudyPage from './StudyPage';
-import CardCreator from './CardCreator';
-import { User, UserContext } from '../context/UserContext';
+import MainPage from "../pages/Home/MainPage";
+import CardBrowser from "../pages/Cards/CardBrowser";
+import DeckBrowser from "../pages/Decks/DeckBrowser";
+import Header from "./Header";
+import Login from "../pages/Login/Login";
+import SignUp from "../pages/SignUp/SignUp";
+import NotFoundPage from "../pages/NotFound/NotFoundPage";
+import StudyPage from "../pages/Study/StudyPage";
+import CardCreator from "../pages/CardCreate/CardCreator";
+import { User, UserContext } from "../context/UserContext";
 import { useEffect, useState } from "react";
 import CONFIG from "../config";
-import SearchPage from "./SearchPage";
-
+import SearchPage from "../pages/Search/SearchPage";
 
 const router = createBrowserRouter([
   {
-    element: <><Header /><Outlet /></>,
-    errorElement: <><Header /><NotFoundPage /></>,
+    element: (
+      <>
+        <Header />
+        <Outlet />
+      </>
+    ),
+    errorElement: (
+      <>
+        <Header />
+        <NotFoundPage />
+      </>
+    ),
     children: [
       {
         path: "/",
@@ -57,14 +62,14 @@ const router = createBrowserRouter([
       {
         path: "/new-card/:id",
         element: <CardCreator />,
-      }
+      },
     ],
   },
 ]);
 
 const theme = createTheme({
   spacing: {
-    xs: '0.3rem',
+    xs: "0.3rem",
   },
 });
 

@@ -1,12 +1,19 @@
-import { Autocomplete, Button, Container, Group, LoadingOverlay, Select } from '@mantine/core';
-import { useEffect, useState } from 'react';
-import ErrorPage from './ErrorPage';
-import CONFIG from '../config';
-import { IconSearch } from '@tabler/icons-react';
-import { DictionaryEntry } from '../types';
-import SearchResult from './SearchResult';
-import { useNavigate } from 'react-router-dom';
-import { useUserContext } from '../context/UserContext';
+import {
+  Autocomplete,
+  Button,
+  Container,
+  Group,
+  LoadingOverlay,
+  Select,
+} from "@mantine/core";
+import { useEffect, useState } from "react";
+import ErrorPage from "../Error/ErrorPage";
+import CONFIG from "../../config";
+import { IconSearch } from "@tabler/icons-react";
+import { DictionaryEntry } from "../../types";
+import SearchResult from "./SearchResult";
+import { useNavigate } from "react-router-dom";
+import { useUserContext } from "../../context/UserContext";
 
 type SuggestionsResponse = {
   suggestions: string[];
@@ -16,9 +23,7 @@ type DefineResponse = {
   definitions: DictionaryEntry[];
 };
 
-const dictionalries = [
-  "wiktionary",
-];
+const dictionalries = ["wiktionary"];
 
 const e: DictionaryEntry = {
   word: "test",
@@ -31,7 +36,9 @@ export default function SearchPage() {
   const [error, setError] = useState<string | null>(null);
   const [formInput, setFormInput] = useState("");
   const [suggestions, setDropdownValues] = useState<string[]>([]);
-  const [selectedDict, setSelectedDict] = useState<string | null>(dictionalries[0]);
+  const [selectedDict, setSelectedDict] = useState<string | null>(
+    dictionalries[0]
+  );
   const [entries, setEntries] = useState<DictionaryEntry[]>([]);
   const [searchPerformed, setSearchPerformed] = useState(false);
   const [user, setUser] = useUserContext();
@@ -44,17 +51,19 @@ export default function SearchPage() {
       return;
     }
     try {
-      const response = await fetch(`${CONFIG.backendURL}/api/search/${selectedDict}/${formInput}`, {
-        method: "GET",
-        credentials: "include",
-      });
+      const response = await fetch(
+        `${CONFIG.backendURL}/api/search/${selectedDict}/${formInput}`,
+        {
+          method: "GET",
+          credentials: "include",
+        }
+      );
 
       if (!response.ok) {
         console.log(`Failed to fetch suggestions for ${formInput}`);
       }
       const sugg: SuggestionsResponse = await response.json();
       setDropdownValues(sugg.suggestions);
-
     } catch (error: any) {
       console.error(error);
       setError(error.message);
@@ -68,10 +77,13 @@ export default function SearchPage() {
     try {
       setSearchPerformed(true);
       setLoading(true);
-      const response = await fetch(`${CONFIG.backendURL}/api/define/${selectedDict}/${formInput}`, {
-        method: "GET",
-        credentials: "include",
-      });
+      const response = await fetch(
+        `${CONFIG.backendURL}/api/define/${selectedDict}/${formInput}`,
+        {
+          method: "GET",
+          credentials: "include",
+        }
+      );
 
       if (!response.ok) {
         throw new Error("doSearch failed");
@@ -79,7 +91,6 @@ export default function SearchPage() {
 
       const data: DefineResponse = await response.json();
       setEntries(data.definitions);
-
     } catch (error: any) {
       console.error(error);
       setError(error.message);
@@ -87,7 +98,6 @@ export default function SearchPage() {
       setLoading(false);
     }
   };
-
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -107,41 +117,36 @@ export default function SearchPage() {
       <LoadingOverlay visible={loading} />
 
       <h2>Search</h2>
-      <Group
-        gap="sm">
-
+      <Group gap="sm">
         <Autocomplete
           data={suggestions}
           value={formInput}
           onChange={(s) => setFormInput(s)}
-          style={{ width: '50%' }}
+          style={{ width: "50%" }}
         />
         <Select
           value={selectedDict}
           onChange={(value) => setSelectedDict(value)}
           data={dictionalries.map((d) => ({ value: d, label: d }))}
         />
-        <Button
-          leftSection={<IconSearch />}
-          onClick={doSearch}
-        >
+        <Button leftSection={<IconSearch />} onClick={doSearch}>
           Search
         </Button>
       </Group>
 
       {searchPerformed && <p>{entries.length} Results</p>}
       {searchPerformed && !entries && <h3>No Results</h3>}
-      {searchPerformed && entries.map((entry, index) => (
-        <SearchResult
-          key={index}
-          entry={entry}
-          onPress={() => {
-            // TODO: get the current deck from the user context?
-            navigate("/new-card/1", { state: { entry } });
-          }} />
-      ))}
-
-
+      {searchPerformed &&
+        entries.map((entry, index) => (
+          <SearchResult
+            key={index}
+            entry={entry}
+            onPress={() => {
+              // TODO: get the current deck from the user context?
+              navigate("/new-card/1", { state: { entry } });
+            }}
+          />
+        ))}
     </Container>
   );
 }

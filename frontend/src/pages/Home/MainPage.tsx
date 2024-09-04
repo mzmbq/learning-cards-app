@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { useUserContext } from "../context/UserContext";
+import { useUserContext } from "../../context/UserContext";
 import { useEffect } from "react";
 
 function MainPage() {
@@ -12,11 +12,7 @@ function MainPage() {
     }
   }, [navigate, user]);
 
-  return (
-    <>
-
-    </>
-  );
+  return <></>;
 }
 
 export default MainPage;
