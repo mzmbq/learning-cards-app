@@ -25,3 +25,7 @@ export type DictionaryEntry = {
   definition: string;
   examples?: string[];
 };
+
+export type User = {
+  userName: string;
+};

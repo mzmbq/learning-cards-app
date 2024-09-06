@@ -11,9 +11,7 @@ import SignUp from "../pages/SignUp/SignUp";
 import NotFoundPage from "../pages/NotFound/NotFoundPage";
 import StudyPage from "../pages/Study/StudyPage";
 import CardCreator from "../pages/CardCreate/CardCreator";
-import { User, UserContext } from "../context/UserContext";
-import { useEffect, useState } from "react";
-import CONFIG from "../config";
+import { UserContextProvider } from "../context/UserContext";
 import SearchPage from "../pages/Search/SearchPage";
 
 const router = createBrowserRouter([
@@ -73,41 +71,13 @@ const theme = createTheme({
   },
 });
 
-const defaultUser: User = {
-  userName: "",
-};
-
 function App() {
-  const [user, setUser] = useState<User>(defaultUser);
-
-  const fetchUser = async () => {
-    try {
-      const response = await fetch(`${CONFIG.backendURL}/api/user/whoami`, {
-        method: "GET",
-        credentials: "include",
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setUser({ ...defaultUser, userName: data.email });
-      } else {
-        setUser({ ...defaultUser, userName: "" });
-      }
-    } catch (error: any) {
-      console.error(error);
-    }
-  };
-
-  useEffect(() => {
-    fetchUser();
-  }, []);
-
   return (
-    <UserContext.Provider value={[user, setUser]}>
+    <UserContextProvider>
       <MantineProvider defaultColorScheme="auto" theme={theme}>
         <RouterProvider router={router} />
       </MantineProvider>
-    </UserContext.Provider>
+    </UserContextProvider>
   );
 }
 
