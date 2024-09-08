@@ -1,0 +1,60 @@
+services:
+  psql:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: ${DB_DATABASE}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "${DB_PORT}:5432"
+    volumes:
+      - psql_volume:/var/lib/postgresql/data
+    healthcheck:
+      test: pg_isready -U ${DB_USERNAME} -d ${DB_DATABASE}
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
+  migrate:
+    image: migrate/migrate
+    volumes:
+      - ./migrations:/migrations
+    env_file:
+      - .env
+    command:
+      [
+        "-path",
+        "/migrations",
+        "-database",
+        "postgresql://${DB_USERNAME}:${DB_PASSWORD}@psql:${DB_PORT}/${DB_DATABASE}?sslmode=disable",
+        "-verbose",
+        "up",
+      ]
+    depends_on:
+      psql:
+        condition: service_healthy
+
+  backend:
+    image: mzmbq/lca-backend:latest
+    volumes:
+      - ./config.toml:/config.toml
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql://${DB_USERNAME}:${DB_PASSWORD}@psql:${DB_PORT}/${DB_DATABASE}?sslmode=disable
+    depends_on:
+      psql:
+        condition: service_healthy
+
+  frontend:
+    image: mzmbq/lca-frontend:latest
+    env_file:
+      - .env
+    ports:
+      - "8080:8080"
+    depends_on:
+      - backend
+
+volumes:
+  psql_volume:
