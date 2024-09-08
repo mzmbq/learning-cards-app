@@ -26,3 +26,11 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/lca-backend:latest
+
+      - name: Build and push frontend image
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: ./frontend/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/lca-frontend:latest
