@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"testing"
+	"time"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/mzmbq/learning-cards-app/backend/internal/app/apiserver"
@@ -16,7 +17,7 @@ var store *sqlstore.Store
 
 func TestMain(m *testing.M) {
 	dbURL := os.Getenv("TESTDB_URL")
-	db, err := apiserver.NewDB(dbURL)
+	db, err := apiserver.NewDB(dbURL, 10*time.Second)
 	if err != nil {
 		log.Fatal(err)
 		os.Exit(-1)

@@ -15,7 +15,7 @@ import (
 )
 
 func Start(config *Config) error {
-	db, err := NewDB(config.DatabaseURL)
+	db, err := NewDB(config.DatabaseURL, time.Duration(config.DatabaseTimeout))
 	if err != nil {
 		return err
 	}
@@ -44,14 +44,14 @@ func Start(config *Config) error {
 	return http.ListenAndServe(config.BindAddr, srv)
 }
 
-func NewDB(dbURL string) (*sql.DB, error) {
+func NewDB(dbURL string, timeout time.Duration) (*sql.DB, error) {
 	log.Println("Connecting to database")
 	db, err := sql.Open("pgx", dbURL)
 	if err != nil {
 		return nil, err
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), timeout*time.Second)
 	defer cancel()
 	if err := db.PingContext(ctx); err != nil {
 		db.Close()

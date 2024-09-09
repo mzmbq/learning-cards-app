@@ -21,12 +21,12 @@ func main() {
 	flag.Parse()
 
 	config := apiserver.NewConfig()
-
+	// First load the configuration from the config file
 	_, err := toml.DecodeFile(configPath, config)
 	if err != nil {
 		log.Fatal(err)
 	}
-
+	// Then load the configuration from the environment variables (overrides the config file)
 	err = envconfig.Process("", config)
 	if err != nil {
 		log.Fatal(err)
