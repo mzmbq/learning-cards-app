@@ -10,6 +10,7 @@ import StudyPage from "../pages/Study/StudyPage";
 import CardCreator from "../pages/CardCreate/CardCreator";
 import SearchPage from "../pages/Search/SearchPage";
 import Header from "../components/Header";
+import Footer from "../components/Footer";
 
 const router = createBrowserRouter([
   {
@@ -17,12 +18,14 @@ const router = createBrowserRouter([
       <>
         <Header />
         <Outlet />
+        <Footer />
       </>
     ),
     errorElement: (
       <>
         <Header />
         <NotFoundPage />
+        <Footer />
       </>
     ),
     children: [
