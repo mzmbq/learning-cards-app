@@ -1,18 +1,19 @@
-import { Center, Container, useMantineColorScheme } from "@mantine/core";
-import GitHubLogo from "./GitHubLogo";
+import { ActionIcon, Group } from "@mantine/core";
+import { IconBrandGithub } from "@tabler/icons-react";
+
 import classes from "./Footer.module.css";
 
 const Footer = () => {
-  const scheme = useMantineColorScheme();
-  const isDark = scheme.colorScheme === "dark";
-
   return (
     <div className={classes.footer}>
-      <div className={classes.footerContent}>
-        <GitHubLogo
-          dark={isDark}
-          url={"https://github.com/mzmbq/learning-cards-app"}
-        />
+      <div className={classes.inner}>
+        <Group gap="xs" justify="flex-end" wrap="nowrap">
+          <ActionIcon size="lg" variant="default" radius="xl">
+            <a href="https://github.com/mzmbq/learning-cards-app">
+              <IconBrandGithub></IconBrandGithub>
+            </a>
+          </ActionIcon>
+        </Group>
       </div>
     </div>
   );
