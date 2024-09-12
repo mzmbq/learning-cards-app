@@ -16,6 +16,7 @@ import {
   IconDots,
   IconEdit,
   IconListSearch,
+  IconPlus,
   IconTrash,
 } from "@tabler/icons-react";
 import { useNavigate } from "react-router-dom";
@@ -91,6 +92,14 @@ function DeckBrowserRow({ deck, deckDelete, deckRename }: Props) {
           onClick={() => navigate(`/study/${deck.id}`)}
         >
           Study
+        </Button>
+        <Button
+          size="sm"
+          color="blue"
+          leftSection={<IconPlus />}
+          onClick={() => navigate(`/new-card/${deck.id}`)}
+        >
+          Add
         </Button>
       </Stack>
     </Card>
