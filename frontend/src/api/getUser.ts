@@ -16,7 +16,7 @@ export const fetchUser = async (): Promise<User | null> => {
     }
   } catch (error: any) {
     console.error(error);
-  } finally {
     return null;
   }
+  // TIL: `finally` overrides the return value...
 };
