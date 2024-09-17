@@ -1,11 +1,25 @@
 package apiserver
 
 import (
+	"errors"
 	"log"
 	"net/http"
+	"regexp"
+	"strings"
 
 	"github.com/mzmbq/learning-cards-app/backend/internal/app/dict"
 )
+
+var invalidCharsRegex = regexp.MustCompile(`[\/\\:;?!@#$%^&*()\[\]{}<>|~]`)
+
+func validateWord(word string) (string, error) {
+	word = strings.TrimSpace(word)
+
+	if invalidCharsRegex.MatchString(word) {
+		return "", errors.New("word query contains invalid characters")
+	}
+	return word, nil
+}
 
 // Get suggestions for a word
 func (s *server) handleSearch() http.HandlerFunc {
@@ -16,7 +30,11 @@ func (s *server) handleSearch() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		dictName := r.PathValue("dict")
 		word := r.PathValue("word")
-		// TODO: validate dictName and word
+
+		word, err := validateWord(word)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+		}
 
 		d, err := dict.New(dictName)
 		if err != nil {
