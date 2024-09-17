@@ -105,7 +105,10 @@ func (s *server) handlerUserSignOut() http.HandlerFunc {
 
 		delete(session.Values, "userID")
 		delete(session.Values, "email")
-		session.Save(r, w)
+		if err = session.Save(r, w); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 	}
 
 }
