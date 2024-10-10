@@ -7,6 +7,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/gorilla/sessions"
 	"golang.org/x/time/rate"
 
@@ -21,11 +22,10 @@ type contextKey string
 const ctxKeyUserID contextKey = "userID"
 
 type server struct {
-	mux           *http.ServeMux
+	mux           *chi.Mux
 	store         store.Store
 	sessionsStore sessions.Store
 
-	middlewares []Middleware
 	// allowed origins for CORS
 	CORSOrigins []string
 	// rate limiting
@@ -42,7 +42,7 @@ type client struct {
 
 func newServer(store store.Store, sessionsStore sessions.Store, CORSOrigins []string, globalLimiter *rate.Limiter, userLimiter *rate.Limiter) *server {
 	s := &server{
-		mux:           http.NewServeMux(),
+		mux:           chi.NewRouter(),
 		store:         store,
 		sessionsStore: sessionsStore,
 		CORSOrigins:   CORSOrigins,
@@ -106,26 +106,4 @@ func (s *server) userFromRequest(r *http.Request) (*model.User, error) {
 	}
 
 	return u, nil
-}
-
-func (s *server) Use(ms ...Middleware) {
-	s.middlewares = append(s.middlewares, ms...)
-}
-
-func (s *server) Handle(pattern string, handler http.Handler) {
-	for i := range s.middlewares {
-		// aply last added middleware first
-		handler = s.middlewares[len(s.middlewares)-1-i](handler)
-	}
-	s.mux.Handle(pattern, handler)
-}
-
-func (s *server) HandleNoMiddleware(pattern string, handler http.Handler) {
-	s.mux.Handle(pattern, handler)
-}
-
-func (s *server) handleHealthcheck() http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		s.WriteJSON(w, http.StatusOK, map[string]string{"status": "ok"})
-	})
 }

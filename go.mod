@@ -5,6 +5,7 @@ go 1.23
 require (
 	github.com/BurntSushi/toml v1.3.2
 	github.com/PuerkitoBio/goquery v1.9.2
+	github.com/go-chi/chi/v5 v5.1.0
 	github.com/go-playground/validator/v10 v10.22.0
 	github.com/gorilla/sessions v1.2.2
 	github.com/jackc/pgx/v5 v5.5.5

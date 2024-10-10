@@ -1,28 +1,44 @@
 package apiserver
 
+import (
+	"github.com/go-chi/chi/v5"
+)
+
 func (s *server) routes() {
-	s.Use(s.withLogging, s.withCORS, s.withGlobalRateLimit, s.withAuth, s.withUserRateLimit)
+	apiRouter := chi.NewRouter()
 
-	s.HandleNoMiddleware("GET /api/health", s.withLogging(s.withCORS(s.withGlobalRateLimit(s.handleHealthcheck()))))
+	apiRouter.Use(s.withLogging, s.withCORS, s.withGlobalRateLimit)
 
-	s.HandleNoMiddleware("POST /api/user/create", s.withLogging(s.withCORS(s.handleUserCreate())))
-	s.HandleNoMiddleware("POST /api/user/auth", s.withLogging(s.withCORS(s.handleUserAuth())))
-	s.Handle("GET /api/user/whoami", s.handleUserWhoami())
-	s.Handle("GET /api/user/signout", s.handlerUserSignOut())
+	// Routes that do not require authentication
+	apiRouter.Group(func(r chi.Router) {
+		r.Get("/health", s.handleHealthcheck())
+		r.Post("/user/create", s.handleUserCreate())
+		r.Post("/user/auth", s.handleUserAuth())
+	})
 
-	s.Handle("GET /api/decks/list", s.handleDecksList())
-	s.Handle("POST /api/deck/create", s.handleDeckCreate())
-	s.Handle("GET /api/deck/delete/{id}", s.handleDeckDelete())
-	s.Handle("GET /api/deck/list-cards/{id}", s.handleDeckListCards())
-	s.Handle("POST /api/deck/rename/{id}", s.handleDeckRename())
+	// Routes that require authentication
+	apiRouter.Group(func(r chi.Router) {
+		r.Use(s.withAuth, s.withUserRateLimit)
 
-	s.Handle("POST /api/card/create", s.handleCardCreate())
-	s.Handle("POST /api/card/update/{id}", s.handleCardUpdate())
-	s.Handle("GET /api/card/delete/{id}", s.handleCardDelete())
+		r.Get("/user/whoami", s.handleUserWhoami())
+		r.Get("/user/signout", s.handlerUserSignOut())
 
-	s.Handle("GET /api/study/get-card/{deck_id}", s.handleStudyGetCard())
-	s.Handle("POST /api/study/submit/{card_id}", s.handleStudySubmit())
+		r.Get("/decks/list", s.handleDecksList())
+		r.Post("/deck/create", s.handleDeckCreate())
+		r.Get("/deck/delete/{id}", s.handleDeckDelete())
+		r.Get("/deck/list-cards/{id}", s.handleDeckListCards())
+		r.Post("/deck/rename/{id}", s.handleDeckRename())
 
-	s.Handle("GET /api/define/{dict}/{word}", s.handleDefine())
-	s.Handle("GET /api/search/{dict}/{word}", s.handleSearch())
+		r.Post("/card/create", s.handleCardCreate())
+		r.Post("/card/update/{id}", s.handleCardUpdate())
+		r.Get("/card/delete/{id}", s.handleCardDelete())
+
+		r.Get("/study/get-card/{deck_id}", s.handleStudyGetCard())
+		r.Post("/study/submit/{card_id}", s.handleStudySubmit())
+
+		r.Get("/define/{dict}/{word}", s.handleDefine())
+		r.Get("/search/{dict}/{word}", s.handleSearch())
+	})
+
+	s.mux.Mount("/api", apiRouter)
 }
