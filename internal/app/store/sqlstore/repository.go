@@ -136,6 +136,7 @@ func (r *DeckRepository) FindAllByUserID(id int) ([]model.Deck, error) {
 	return decks, nil
 }
 
+// Delete decks and all cards in it
 func (r *DeckRepository) Delete(id int) error {
 	// delete deck
 	stmt, err := r.store.db.Prepare("DELETE FROM decks WHERE id = $1")

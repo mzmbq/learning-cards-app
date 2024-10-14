@@ -6,6 +6,8 @@ import (
 
 type Store struct {
 	userRepository *UserRepository
+	deckRepository *DeckRepository
+	cardRepository *CardRepository
 }
 
 func New() *Store {
@@ -20,12 +22,18 @@ func (s *Store) User() store.UserRepository {
 	return s.userRepository
 }
 
-// TODO: implement
-
 func (s *Store) Deck() store.DeckRepository {
-	return nil
+	if s.deckRepository == nil {
+		s.deckRepository = NewDeckRepo(s)
+	}
+
+	return s.deckRepository
 }
 
 func (s *Store) Card() store.CardRepository {
-	return nil
+	if s.cardRepository == nil {
+		s.cardRepository = NewCardRepo(s)
+	}
+
+	return s.cardRepository
 }
