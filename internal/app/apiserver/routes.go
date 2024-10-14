@@ -11,17 +11,17 @@ func (s *server) routes() {
 
 	// Routes that do not require authentication
 	apiRouter.Group(func(r chi.Router) {
-		r.Get("/health", s.handleHealthcheck())
-		r.Post("/user/create", s.handleUserCreate())
-		r.Post("/user/auth", s.handleUserAuth())
+		r.Get("/health", MakeHandler(s.handleHealthcheck()))
+		r.Post("/user/create", MakeHandler(s.handleUserCreate()))
+		r.Post("/user/auth", MakeHandler(s.handleUserAuth()))
 	})
 
 	// Routes that require authentication
 	apiRouter.Group(func(r chi.Router) {
 		r.Use(s.withAuth, s.withUserRateLimit)
 
-		r.Get("/user/whoami", s.handleUserWhoami())
-		r.Get("/user/signout", s.handlerUserSignOut())
+		r.Get("/user/whoami", MakeHandler(s.handleUserWhoami()))
+		r.Get("/user/signout", MakeHandler(s.handlerUserSignOut()))
 
 		r.Get("/decks/list", s.handleDecksList())
 		r.Post("/deck/create", s.handleDeckCreate())

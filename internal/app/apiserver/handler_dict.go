@@ -56,7 +56,7 @@ func (s *server) handleSearch() http.HandlerFunc {
 		resp := &response{
 			Suggestions: suggs,
 		}
-		s.WriteJSON(w, http.StatusOK, resp)
+		WriteJSON(w, http.StatusOK, resp)
 	}
 
 }
@@ -84,7 +84,7 @@ func (s *server) handleDefine() http.HandlerFunc {
 				http.Error(w, err.Error(), http.StatusTooManyRequests)
 				return
 			}
-			http.Error(w, "", http.StatusInternalServerError)
+			http.Error(w, err.Error(), http.StatusNoContent)
 			log.Println(err)
 			return
 		}
@@ -92,7 +92,7 @@ func (s *server) handleDefine() http.HandlerFunc {
 		resp := &response{
 			Definitions: defs,
 		}
-		s.WriteJSON(w, http.StatusOK, resp)
+		WriteJSON(w, http.StatusOK, resp)
 	}
 
 }

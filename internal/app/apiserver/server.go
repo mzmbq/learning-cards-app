@@ -2,7 +2,6 @@ package apiserver
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 	"sync"
 	"time"
@@ -79,14 +78,15 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	s.mux.ServeHTTP(w, r)
 }
 
-func (s *server) WriteJSON(w http.ResponseWriter, status int, v any) {
-	w.Header().Set("Content-Type", "application/json")
+func WriteJSON(w http.ResponseWriter, status int, v any) error {
 	w.WriteHeader(status)
+	w.Header().Set("Content-Type", "application/json")
 
-	err := json.NewEncoder(w).Encode(v)
-	if err != nil {
-		log.Println(err)
-	}
+	return json.NewEncoder(w).Encode(v)
+}
+
+func WriteOK(w http.ResponseWriter) error {
+	return WriteJSON(w, http.StatusOK, map[string]any{"statusCode": http.StatusOK})
 }
 
 func (s *server) userFromRequest(r *http.Request) (*model.User, error) {

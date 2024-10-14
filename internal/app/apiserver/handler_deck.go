@@ -49,7 +49,7 @@ func (s *server) handleDeckCreate() http.HandlerFunc {
 		res := response{
 			DeckID: d.ID,
 		}
-		s.WriteJSON(w, http.StatusOK, res)
+		WriteJSON(w, http.StatusOK, res)
 	}
 }
 
@@ -143,7 +143,7 @@ func (s *server) handleDeckListCards() http.HandlerFunc {
 			log.Println(err)
 			return
 		}
-		s.WriteJSON(w, http.StatusOK, response{Cards: cards})
+		WriteJSON(w, http.StatusOK, response{Cards: cards})
 	}
 }
 
@@ -168,7 +168,7 @@ func (s *server) handleDecksList() http.HandlerFunc {
 		res := &response{
 			Decks: decks,
 		}
-		s.WriteJSON(w, http.StatusOK, res)
+		WriteJSON(w, http.StatusOK, res)
 	}
 
 }

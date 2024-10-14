@@ -2,25 +2,23 @@ package apiserver
 
 import (
 	"encoding/json"
-	"log"
+	"fmt"
 	"net/http"
 
 	"github.com/mzmbq/learning-cards-app/backend/internal/app/model"
 	"github.com/mzmbq/learning-cards-app/backend/internal/app/store"
 )
 
-func (s *server) handleUserCreate() http.HandlerFunc {
+func (s *server) handleUserCreate() APIFunc {
 	type request struct {
 		Email    string `json:"email"`
 		Password string `json:"password"`
 	}
 
-	return func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) error {
 		req := request{}
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			http.Error(w, "invalid json payload", http.StatusBadRequest)
-			log.Println(err)
-			return
+			return InvalidJSON()
 		}
 
 		u := model.User{
@@ -29,57 +27,45 @@ func (s *server) handleUserCreate() http.HandlerFunc {
 		}
 
 		if err := u.Validate(); err != nil {
-			http.Error(w, "invalid json payload", http.StatusBadRequest)
-			log.Println("user validation failed for user: ", u, " error: ", err)
-			return
+			return err
 		}
 
 		uFound, err := s.store.User().FindByEmail(req.Email)
 		if err != nil && err != store.ErrRecordNotFound {
-			http.Error(w, "", http.StatusInternalServerError)
-			log.Println(err)
-			return
+			return err
 		}
 		if uFound != nil {
-			http.Error(w, "a user with this email already exists", http.StatusConflict)
-			return
+			return NewAPIError(http.StatusConflict, "a user with this email already exists")
 		}
 
 		if err := s.store.User().Create(&u); err != nil {
-			http.Error(w, "create user failed", http.StatusInternalServerError)
-			log.Println(err)
-			return
+			return err
 		}
-		s.WriteJSON(w, http.StatusOK, u.ID)
+		return WriteJSON(w, http.StatusOK, u.ID)
 	}
 }
 
-func (s *server) handleUserAuth() http.HandlerFunc {
+func (s *server) handleUserAuth() APIFunc {
 	type request struct {
 		Email    string `json:"email"`
 		Password string `json:"password"`
 	}
 
-	return func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) error {
 		req := request{}
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			http.Error(w, "invalid json payload", http.StatusBadRequest)
-			log.Println(err)
-			return
+			return InvalidJSON()
 		}
 
 		u, err := s.store.User().FindByEmail(req.Email)
 		if err != nil || !u.CheckPassword(req.Password) {
-			http.Error(w, "email or password incorrect", http.StatusUnauthorized)
-			log.Println(err)
-			return
+			return NewAPIError(http.StatusUnauthorized, "email or password incorrect")
 		}
 
+		// Get a session. Creates a new session if the sessions doesn't exist
 		session, err := s.sessionsStore.Get(r, sessionName)
 		if err != nil {
-			http.Error(w, "", http.StatusInternalServerError)
-			log.Println(err)
-			return
+			return err
 		}
 
 		session.Values["userID"] = u.ID
@@ -87,51 +73,45 @@ func (s *server) handleUserAuth() http.HandlerFunc {
 
 		err = session.Save(r, w)
 		if err != nil {
-			http.Error(w, "", http.StatusInternalServerError)
-			log.Println(err)
-			return
+			return err
 		}
-		s.WriteJSON(w, http.StatusOK, u.ID)
+		return WriteJSON(w, http.StatusOK, map[string]any{"statucCode": http.StatusOK, "id": u.ID})
 	}
 }
 
-func (s *server) handlerUserSignOut() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
+func (s *server) handlerUserSignOut() APIFunc {
+	return func(w http.ResponseWriter, r *http.Request) error {
 		session, err := s.sessionsStore.Get(r, sessionName)
 		if err != nil {
-			http.Error(w, "", http.StatusUnauthorized)
-			return
+			return err
 		}
 
 		delete(session.Values, "userID")
 		delete(session.Values, "email")
 		if err = session.Save(r, w); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
+			return err
 		}
+		return WriteOK(w)
 	}
 
 }
 
-func (s *server) handleUserWhoami() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
+func (s *server) handleUserWhoami() APIFunc {
+	return func(w http.ResponseWriter, r *http.Request) error {
 		id := r.Context().Value(ctxKeyUserID)
 		if id == nil {
-			http.Error(w, "", http.StatusUnauthorized)
-			return
+			panic("withAuth middleware required")
 		}
 
 		idInt, ok := id.(int)
 		if !ok {
-			http.Error(w, "", http.StatusInternalServerError)
-			return
+			return fmt.Errorf("failed to convert id \"%v\" to string", id)
 		}
 
 		u, err := s.store.User().Find(idInt)
 		if err != nil {
-			http.Error(w, "", http.StatusUnauthorized)
-			return
+			return err
 		}
-		s.WriteJSON(w, http.StatusOK, u)
+		return WriteJSON(w, http.StatusOK, u)
 	}
 }

@@ -47,7 +47,7 @@ func (s *server) handleCardCreate() http.HandlerFunc {
 		res := response{
 			CardID: c.ID,
 		}
-		s.WriteJSON(w, http.StatusOK, res)
+		WriteJSON(w, http.StatusOK, res)
 	}
 }
 

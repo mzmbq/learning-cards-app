@@ -57,7 +57,7 @@ func (s *server) handleStudyGetCard() http.HandlerFunc {
 			return
 		}
 
-		s.WriteJSON(w, http.StatusOK, response{Card: cards[0]})
+		WriteJSON(w, http.StatusOK, response{Card: cards[0]})
 	}
 }
 
