@@ -23,21 +23,21 @@ func (s *server) routes() {
 		r.Get("/user/whoami", MakeHandler(s.handleUserWhoami()))
 		r.Get("/user/signout", MakeHandler(s.handlerUserSignOut()))
 
-		r.Get("/decks/list", s.handleDecksList())
-		r.Post("/deck/create", s.handleDeckCreate())
-		r.Get("/deck/delete/{id}", s.handleDeckDelete())
-		r.Get("/deck/list-cards/{id}", s.handleDeckListCards())
-		r.Post("/deck/rename/{id}", s.handleDeckRename())
+		r.Get("/decks/list", MakeHandler(s.handleDecksList()))
+		r.Post("/deck/create", MakeHandler(s.handleDeckCreate()))
+		r.Get("/deck/delete/{id}", MakeHandler(s.handleDeckDelete()))
+		r.Get("/deck/list-cards/{id}", MakeHandler(s.handleDeckListCards()))
+		r.Post("/deck/rename/{id}", MakeHandler(s.handleDeckRename()))
 
-		r.Post("/card/create", s.handleCardCreate())
-		r.Post("/card/update/{id}", s.handleCardUpdate())
-		r.Get("/card/delete/{id}", s.handleCardDelete())
+		r.Post("/card/create", MakeHandler(s.handleCardCreate()))
+		r.Post("/card/update/{id}", MakeHandler(s.handleCardUpdate()))
+		r.Get("/card/delete/{id}", MakeHandler(s.handleCardDelete()))
 
-		r.Get("/study/get-card/{deck_id}", s.handleStudyGetCard())
-		r.Post("/study/submit/{card_id}", s.handleStudySubmit())
+		r.Get("/study/get-card/{deck_id}", MakeHandler(s.handleStudyGetCard()))
+		r.Post("/study/submit/{card_id}", MakeHandler(s.handleStudySubmit()))
 
-		r.Get("/define/{dict}/{word}", s.handleDefine())
-		r.Get("/search/{dict}/{word}", s.handleSearch())
+		r.Get("/define/{dict}/{word}", MakeHandler(s.handleDefine()))
+		r.Get("/search/{dict}/{word}", MakeHandler(s.handleSearch()))
 	})
 
 	s.mux.Mount("/api", apiRouter)

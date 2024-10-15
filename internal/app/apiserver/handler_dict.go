@@ -2,7 +2,7 @@ package apiserver
 
 import (
 	"errors"
-	"log"
+	"fmt"
 	"net/http"
 	"regexp"
 	"strings"
@@ -22,12 +22,12 @@ func validateWord(word string) (string, error) {
 }
 
 // Get suggestions for a word
-func (s *server) handleSearch() http.HandlerFunc {
+func (s *server) handleSearch() APIFunc {
 	type response struct {
 		Suggestions []string `json:"suggestions"`
 	}
 
-	return func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) error {
 		dictName := r.PathValue("dict")
 		word := r.PathValue("word")
 
@@ -38,61 +38,53 @@ func (s *server) handleSearch() http.HandlerFunc {
 
 		d, err := dict.New(dictName)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
+			return InvalidRequestData(map[string]string{"dict": fmt.Sprintf("dictionaray %v not found", dictName)})
 		}
 
 		suggs, err := d.Search(word)
 		if err != nil {
 			if err == dict.ErrTooManyRequests {
-				http.Error(w, err.Error(), http.StatusTooManyRequests)
-				return
+				return NewAPIError(http.StatusTooManyRequests, "too many requests")
 			}
-			http.Error(w, "", http.StatusInternalServerError)
-			log.Println(err)
-			return
+			return err
 		}
 
 		resp := &response{
 			Suggestions: suggs,
 		}
-		WriteJSON(w, http.StatusOK, resp)
+		return WriteJSON(w, http.StatusOK, resp)
 	}
 
 }
 
 // Get the definition of a word
-func (s *server) handleDefine() http.HandlerFunc {
+func (s *server) handleDefine() APIFunc {
 	type response struct {
 		Definitions []dict.Entry `json:"definitions"`
 	}
 
-	return func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) error {
 		dictName := r.PathValue("dict")
 		word := r.PathValue("word")
 		// TODO: validate dictName and word
 
 		d, err := dict.New(dictName)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
+			return InvalidRequestData(map[string]string{"dict": err.Error()})
 		}
 
 		defs, err := d.Define(word)
 		if err != nil {
 			if err == dict.ErrTooManyRequests {
-				http.Error(w, err.Error(), http.StatusTooManyRequests)
-				return
+				return NewAPIError(http.StatusTooManyRequests, err.Error())
 			}
-			http.Error(w, err.Error(), http.StatusNoContent)
-			log.Println(err)
-			return
+			return err
 		}
 
 		resp := &response{
 			Definitions: defs,
 		}
-		WriteJSON(w, http.StatusOK, resp)
+		return WriteJSON(w, http.StatusOK, resp)
 	}
 
 }

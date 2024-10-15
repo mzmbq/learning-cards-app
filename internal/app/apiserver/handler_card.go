@@ -2,7 +2,6 @@ package apiserver
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 	"strconv"
 
@@ -10,7 +9,7 @@ import (
 	"github.com/mzmbq/learning-cards-app/backend/internal/app/model"
 )
 
-func (s *server) handleCardCreate() http.HandlerFunc {
+func (s *server) handleCardCreate() APIFunc {
 	type request struct {
 		Card model.Card `json:"card"`
 	}
@@ -18,16 +17,14 @@ func (s *server) handleCardCreate() http.HandlerFunc {
 		CardID int `json:"card_id"`
 	}
 
-	return func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) error {
 		u, err := s.userFromRequest(r)
 		if err != nil {
-			http.Error(w, "", http.StatusUnauthorized)
-			return
+			return Unauthorized()
 		}
 		req := request{}
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			http.Error(w, "", http.StatusInternalServerError)
-			return
+			return InvalidJSON()
 		}
 
 		c := req.Card
@@ -35,92 +32,78 @@ func (s *server) handleCardCreate() http.HandlerFunc {
 		c.Flashcard = *fc
 
 		if !s.store.Deck().BelongsToUser(c.DeckID, u.ID) {
-			http.Error(w, "", http.StatusUnauthorized)
-			return
+			return Unauthorized()
 		}
 
 		if err := s.store.Card().Create(&c); err != nil {
-			http.Error(w, "", http.StatusBadRequest)
-			return
+			return err
 		}
 
 		res := response{
 			CardID: c.ID,
 		}
-		WriteJSON(w, http.StatusOK, res)
+		return WriteJSON(w, http.StatusOK, res)
 	}
 }
 
-func (s *server) handleCardUpdate() http.HandlerFunc {
+func (s *server) handleCardUpdate() APIFunc {
 	type request struct {
 		Card model.Card `json:"card"`
 	}
 
-	return func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) error {
 		u, err := s.userFromRequest(r)
 		if err != nil {
-			http.Error(w, "", http.StatusUnauthorized)
-			return
+			return Unauthorized()
 		}
 		req := request{}
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			http.Error(w, "", http.StatusInternalServerError)
-			return
+			return InvalidJSON()
 		}
 
 		cardIDStr := r.PathValue("id")
 		cardID, err := strconv.Atoi(cardIDStr)
 		if err != nil {
-			http.Error(w, "invalid card id", http.StatusBadRequest)
-			return
+			return InvalidRequestData(map[string]string{"id": "invalid"})
 		}
 
 		c := req.Card
 		c.ID = cardID
 		if !s.store.Card().BelongsToUser(c.ID, u.ID) {
-			http.Error(w, "", http.StatusUnauthorized)
-			log.Printf("unauthorized: card %d, user %d\n", c.ID, u.ID)
-			return
+			return Unauthorized()
 		}
 
 		if !s.store.Deck().BelongsToUser(c.DeckID, u.ID) {
-			http.Error(w, "", http.StatusUnauthorized)
-			log.Printf("unauthorized: deck %d, user %d\n", c.DeckID, u.ID)
-			return
+			return Unauthorized()
 		}
 
 		if err = s.store.Card().Update(&c); err != nil {
-			http.Error(w, "", http.StatusInternalServerError)
-			return
+			return err
 		}
-		w.WriteHeader(http.StatusOK)
+		return WriteOK(w)
 	}
 }
 
-func (s *server) handleCardDelete() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
+func (s *server) handleCardDelete() APIFunc {
+	return func(w http.ResponseWriter, r *http.Request) error {
 		u, err := s.userFromRequest(r)
 		if err != nil {
-			http.Error(w, "", http.StatusUnauthorized)
-			return
+			return err
 		}
 
 		cardIDStr := r.PathValue("id")
 		cardID, err := strconv.Atoi(cardIDStr)
 		if err != nil {
-			http.Error(w, "invalid card id", http.StatusBadRequest)
-			return
+			return InvalidRequestData(map[string]string{"id": "invalid"})
 		}
 
 		if !s.store.Card().BelongsToUser(cardID, u.ID) {
-			http.Error(w, "", http.StatusUnauthorized)
-			return
+			return Unauthorized()
 		}
 
 		if err := s.store.Card().Delete(cardID); err != nil {
-			http.Error(w, "", http.StatusInternalServerError)
-			return
+			return err
 		}
-		w.WriteHeader(http.StatusOK)
+		return WriteOK(w)
 	}
 }

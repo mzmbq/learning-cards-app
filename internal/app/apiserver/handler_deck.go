@@ -2,14 +2,14 @@ package apiserver
 
 import (
 	"encoding/json"
-	"log"
+	"fmt"
 	"net/http"
 	"strconv"
 
 	"github.com/mzmbq/learning-cards-app/backend/internal/app/model"
 )
 
-func (s *server) handleDeckCreate() http.HandlerFunc {
+func (s *server) handleDeckCreate() APIFunc {
 	type request struct {
 		DeckName string `json:"deckname"`
 	}
@@ -17,17 +17,15 @@ func (s *server) handleDeckCreate() http.HandlerFunc {
 		DeckID int `json:"deck_id"`
 	}
 
-	return func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) error {
 		u, err := s.userFromRequest(r)
 		if err != nil {
-			http.Error(w, "", http.StatusInternalServerError)
-			return
+			return err
 		}
 
 		req := request{}
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			http.Error(w, "", http.StatusInternalServerError)
-			return
+			return InvalidJSON()
 		}
 
 		d := model.Deck{
@@ -36,193 +34,156 @@ func (s *server) handleDeckCreate() http.HandlerFunc {
 		}
 
 		if err := d.Validate(); err != nil {
-			http.Error(w, "invalid json payload", http.StatusBadRequest)
-			log.Println("deck validation failed for deck: ", d, " error: ", err)
-			return
+			return NewAPIError(http.StatusBadRequest, "deck validation failed")
 		}
 
 		if err = s.store.Deck().Create(&d); err != nil {
-			http.Error(w, "", http.StatusBadRequest)
-			return
+			return NewAPIError(http.StatusBadRequest, "failed to create deck")
 		}
 
 		res := response{
 			DeckID: d.ID,
 		}
-		WriteJSON(w, http.StatusOK, res)
+		return WriteJSON(w, http.StatusOK, res)
 	}
 }
 
-func (s *server) handleDeckDelete() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
+func (s *server) handleDeckDelete() APIFunc {
+	return func(w http.ResponseWriter, r *http.Request) error {
 		u, err := s.userFromRequest(r)
 		if err != nil {
-			http.Error(w, "", http.StatusInternalServerError)
-			log.Println(err)
-			return
+			return err
 		}
 
 		idStr := r.PathValue("id")
 		if idStr == "" {
-			http.Error(w, "no deck with id: "+idStr, http.StatusInternalServerError)
-			log.Println(err)
-			return
+			return InvalidRequestData(map[string]string{"empty id": ""})
 		}
 
 		id, err := strconv.Atoi(idStr)
 		if err != nil {
-			http.Error(w, "invalid deck id", http.StatusBadRequest)
-			log.Println(err)
-			return
+			return InvalidRequestData(map[string]string{"invalid deck id": idStr})
 		}
 
 		d, err := s.store.Deck().Find(id)
 		if err != nil {
-			http.Error(w, "", http.StatusUnauthorized)
-			log.Println(err)
-			return
+			return Unauthorized()
 		}
 		if d.UserID != u.ID {
-			http.Error(w, "", http.StatusUnauthorized)
-			log.Println(err)
-			return
+			return Unauthorized()
 		}
 
 		err = s.store.Deck().Delete(id)
 		if err != nil {
-			http.Error(w, "", http.StatusInternalServerError)
-			log.Println(err)
-			return
+			return err
 		}
-		w.WriteHeader(http.StatusOK)
+
+		return WriteOK(w)
 	}
 }
 
-func (s *server) handleDeckListCards() http.HandlerFunc {
+func (s *server) handleDeckListCards() APIFunc {
 	type response struct {
 		Cards []model.Card `json:"cards"`
 	}
 
-	return func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) error {
 		u, err := s.userFromRequest(r)
 		if err != nil {
-			http.Error(w, "", http.StatusInternalServerError)
-			log.Println(err)
-			return
+			return err
 		}
 
 		idStr := r.PathValue("id")
 		if idStr == "" {
-			http.Error(w, "no deck with id: "+idStr, http.StatusInternalServerError)
-			log.Println(err)
-			return
+			return InvalidRequestData(map[string]string{"id": "empty id"})
 		}
 
 		id, err := strconv.Atoi(idStr)
 		if err != nil {
-			http.Error(w, "invalid deck id", http.StatusBadRequest)
-			log.Println(err)
-			return
+			return InvalidRequestData(map[string]string{"id": fmt.Sprintf("invalid deck id: %v", idStr)})
 		}
 
 		d, err := s.store.Deck().Find(id)
 		if err != nil {
-			http.Error(w, "", http.StatusUnauthorized)
-			log.Println(err)
-			return
+			return Unauthorized()
 		}
 		if d.UserID != u.ID {
-			http.Error(w, "", http.StatusUnauthorized)
-			log.Println(err)
-			return
+			return Unauthorized()
 		}
 
 		cards, err := s.store.Card().FindAllByDeckID(id)
 		if err != nil {
-			http.Error(w, "", http.StatusInternalServerError)
-			log.Println(err)
-			return
+			return err
 		}
-		WriteJSON(w, http.StatusOK, response{Cards: cards})
+		return WriteJSON(w, http.StatusOK, response{Cards: cards})
 	}
 }
 
-func (s *server) handleDecksList() http.HandlerFunc {
+func (s *server) handleDecksList() APIFunc {
 	type response struct {
 		Decks []model.Deck `json:"decks"`
 	}
 
-	return func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) error {
 		u, err := s.userFromRequest(r)
 		if err != nil {
-			http.Error(w, "", http.StatusInternalServerError)
-			return
+			return err
 		}
 
 		decks, err := s.store.Deck().FindAllByUserID(u.ID)
 		if err != nil {
-			http.Error(w, "", http.StatusInternalServerError)
-			return
+			return err
 		}
 
 		res := &response{
 			Decks: decks,
 		}
-		WriteJSON(w, http.StatusOK, res)
+		return WriteJSON(w, http.StatusOK, res)
 	}
 
 }
 
-func (s *server) handleDeckRename() http.HandlerFunc {
+func (s *server) handleDeckRename() APIFunc {
 	type request struct {
 		DeckName string `json:"deckname"`
 	}
 
-	return func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) error {
 		u, err := s.userFromRequest(r)
 		if err != nil {
-			http.Error(w, "", http.StatusInternalServerError)
-			return
+			return err
 		}
 		req := request{}
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			http.Error(w, "", http.StatusInternalServerError)
-			return
+			return InvalidJSON()
 		}
 
 		// Extract the deck id from the request path
 		idStr := r.PathValue("id")
 		id, err := strconv.Atoi(idStr)
 		if err != nil {
-			http.Error(w, "invalid deck id", http.StatusBadRequest)
-			log.Println(err)
-			return
+			return InvalidRequestData(map[string]string{"id": fmt.Sprintf("invalid deck id: %v", idStr)})
 		}
 
 		d, err := s.store.Deck().Find(id)
 		if err != nil {
-			http.Error(w, "", http.StatusInternalServerError)
-			return
+			return err
 		}
 		if d.UserID != u.ID {
-			http.Error(w, "", http.StatusUnauthorized)
-			return
+			return Unauthorized()
 		}
 
 		// Validate the new deck name
 		d.Name = req.DeckName
 		if err := d.Validate(); err != nil {
-			http.Error(w, "invalid json payload", http.StatusBadRequest)
-			log.Println("deck validation failed for deck: ", d, " error: ", err)
-			return
+			return InvalidRequestData(map[string]string{"deckname": fmt.Sprintf("invalid deck name: %v", idStr)})
 		}
 
 		// Rename the deck
 		err = s.store.Deck().Update(d)
 		if err != nil {
-			http.Error(w, "", http.StatusInternalServerError)
-			return
+			return err
 		}
-		w.WriteHeader(http.StatusOK)
+		return WriteOK(w)
 	}
 }

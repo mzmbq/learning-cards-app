@@ -33,6 +33,10 @@ func InvalidJSON() APIError {
 	return NewAPIError(http.StatusBadRequest, "invalid JSON request data")
 }
 
+func Unauthorized() APIError {
+	return NewAPIError(http.StatusUnauthorized, "unauthorized")
+}
+
 type APIFunc func(w http.ResponseWriter, r *http.Request) error
 
 func MakeHandler(h APIFunc) http.HandlerFunc {
