@@ -11,29 +11,21 @@ type Store struct {
 }
 
 func New() *Store {
-	return &Store{}
+	s := &Store{}
+	s.userRepository = NewUserRepo(s)
+	s.deckRepository = NewDeckRepo(s)
+	s.cardRepository = NewCardRepo(s)
+	return s
 }
 
 func (s *Store) User() store.UserRepository {
-	if s.userRepository == nil {
-		s.userRepository = NewUserRepo(s)
-	}
-
 	return s.userRepository
 }
 
 func (s *Store) Deck() store.DeckRepository {
-	if s.deckRepository == nil {
-		s.deckRepository = NewDeckRepo(s)
-	}
-
 	return s.deckRepository
 }
 
 func (s *Store) Card() store.CardRepository {
-	if s.cardRepository == nil {
-		s.cardRepository = NewCardRepo(s)
-	}
-
 	return s.cardRepository
 }
