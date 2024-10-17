@@ -1,6 +1,8 @@
 package teststore
 
 import (
+	"errors"
+
 	"github.com/mzmbq/learning-cards-app/backend/internal/app/model"
 	"github.com/mzmbq/learning-cards-app/backend/internal/app/store"
 )
@@ -23,6 +25,9 @@ func (r *UserRepository) Create(u *model.User) error {
 	}
 
 	u.ID = len(r.users) + 1
+	if _, ok := r.users[u.Email]; ok {
+		return errors.New("duplicate email")
+	}
 	r.users[u.Email] = u
 
 	return nil
