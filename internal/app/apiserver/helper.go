@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+
+	"github.com/go-playground/validator/v10"
 )
 
 type APIError struct {
@@ -29,6 +31,14 @@ func InvalidRequestData(errors map[string]string) APIError {
 	}
 }
 
+func ValidationErrors(validationErrors validator.ValidationErrors) APIError {
+	errors := make(map[string]string)
+	for _, fe := range validationErrors {
+		errors[fe.Field()] = "validation failed"
+	}
+	return InvalidRequestData(errors)
+}
+
 func InvalidJSON() APIError {
 	return NewAPIError(http.StatusBadRequest, "invalid JSON request data")
 }
@@ -49,7 +59,11 @@ func MakeHandler(h APIFunc) http.HandlerFunc {
 					"internal server error",
 				)
 			}
-			WriteJSON(w, apiErr.StatusCode, apiErr)
+			writeErr := WriteJSON(w, apiErr.StatusCode, apiErr)
+			if writeErr != nil {
+				log.Println("error: WriteJSON failed in MakeHandler", writeErr.Error())
+			}
+			// WriteJSON(w, apiErr.StatusCode, apiErr)
 			log.Println("HTTP API error:", err.Error(), r.URL.Path)
 		}
 	}

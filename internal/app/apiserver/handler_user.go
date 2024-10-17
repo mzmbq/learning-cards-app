@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/mzmbq/learning-cards-app/backend/internal/app/model"
 	"github.com/mzmbq/learning-cards-app/backend/internal/app/store"
 )
@@ -27,7 +28,11 @@ func (s *server) handleUserCreate() APIFunc {
 		}
 
 		if err := u.Validate(); err != nil {
-			return err
+			if validationErrs, ok := err.(validator.ValidationErrors); ok {
+				return ValidationErrors(validationErrs)
+			} else {
+				return err
+			}
 		}
 
 		uFound, err := s.store.User().FindByEmail(req.Email)

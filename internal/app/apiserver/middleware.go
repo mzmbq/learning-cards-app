@@ -105,7 +105,7 @@ func (s *server) rateLimiterFromRequest(r *http.Request) *rate.Limiter {
 
 func (s *server) withUserRateLimit(h http.Handler) http.Handler {
 	if s.userLimiter == nil {
-		log.Println("User rate limiting is disabled")
+		// log.Println("User rate limiting is disabled")
 		return h
 	}
 
