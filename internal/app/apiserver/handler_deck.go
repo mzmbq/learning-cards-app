@@ -34,7 +34,7 @@ func (s *server) handleDeckCreate() APIFunc {
 		}
 
 		if err := d.Validate(); err != nil {
-			return NewAPIError(http.StatusBadRequest, "deck validation failed")
+			return ValidationErrors(err)
 		}
 
 		if err = s.store.Deck().Create(&d); err != nil {
@@ -176,7 +176,7 @@ func (s *server) handleDeckRename() APIFunc {
 		// Validate the new deck name
 		d.Name = req.DeckName
 		if err := d.Validate(); err != nil {
-			return InvalidRequestData(map[string]string{"deckname": fmt.Sprintf("invalid deck name: %v", idStr)})
+			return ValidationErrors(err)
 		}
 
 		// Rename the deck

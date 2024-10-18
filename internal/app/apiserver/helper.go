@@ -31,9 +31,15 @@ func InvalidRequestData(errors map[string]string) APIError {
 	}
 }
 
-func ValidationErrors(validationErrors validator.ValidationErrors) APIError {
+// create APIError from validator error
+func ValidationErrors(err error) error {
+	validationErrs, ok := err.(validator.ValidationErrors)
+	if !ok {
+		log.Println()
+		return err
+	}
 	errors := make(map[string]string)
-	for _, fe := range validationErrors {
+	for _, fe := range validationErrs {
 		errors[fe.Field()] = "validation failed"
 	}
 	return InvalidRequestData(errors)
@@ -64,7 +70,7 @@ func MakeHandler(h APIFunc) http.HandlerFunc {
 				log.Println("error: WriteJSON failed in MakeHandler", writeErr.Error())
 			}
 			// WriteJSON(w, apiErr.StatusCode, apiErr)
-			log.Println("HTTP API error:", err.Error(), r.URL.Path)
+			log.Println(err.Error(), r.URL.Path)
 		}
 	}
 }
