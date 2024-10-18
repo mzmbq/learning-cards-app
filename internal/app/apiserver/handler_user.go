@@ -62,7 +62,7 @@ func (s *server) handleUserAuth() APIFunc {
 			return NewAPIError(http.StatusUnauthorized, "email or password incorrect")
 		}
 
-		// Get a session. Creates a new session if the sessions doesn't exist
+		// Get the session. Creates a new session if the session doesn't exist
 		session, err := s.sessionsStore.Get(r, sessionName)
 		if err != nil {
 			return err
@@ -105,7 +105,7 @@ func (s *server) handleUserWhoami() APIFunc {
 
 		idInt, ok := id.(int)
 		if !ok {
-			return fmt.Errorf("failed to convert id \"%v\" to string", id)
+			return fmt.Errorf("id \"%v\" must be an integer", id)
 		}
 
 		u, err := s.store.User().Find(idInt)
