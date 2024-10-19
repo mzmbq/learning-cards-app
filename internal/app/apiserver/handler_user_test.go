@@ -58,7 +58,7 @@ func TestServer_handleUserCreate(t *testing.T) {
 			assert.NotNil(t, res)
 			defer res.Body.Close()
 
-			assert.Equal(t, res.StatusCode, tc.expectedCode)
+			assert.Equal(t, tc.expectedCode, res.StatusCode)
 		})
 	}
 }
@@ -107,7 +107,7 @@ func TestServer_handleUserAuth(t *testing.T) {
 			assert.NotNil(t, res)
 			defer res.Body.Close()
 
-			assert.Equal(t, res.StatusCode, tc.expectedCode)
+			assert.Equal(t, tc.expectedCode, res.StatusCode)
 		})
 	}
 }
@@ -150,7 +150,7 @@ func TestServer_handlerUserSignOut(t *testing.T) {
 	assert.NotNil(t, res)
 	res.Body.Close()
 
-	assert.Equal(t, res.StatusCode, http.StatusOK)
+	assert.Equal(t, http.StatusOK, res.StatusCode)
 
 	// Logout
 	req = httptest.NewRequest(http.MethodGet, "/api/user/signout", nil)
@@ -177,7 +177,7 @@ func TestServer_handlerUserSignOut(t *testing.T) {
 	assert.NotNil(t, res)
 	defer res.Body.Close()
 
-	assert.Equal(t, res.StatusCode, http.StatusUnauthorized)
+	assert.Equal(t, http.StatusUnauthorized, res.StatusCode)
 
 }
 
@@ -230,7 +230,7 @@ func TestServer_handleUserWhoami(t *testing.T) {
 			assert.NotNil(t, res)
 			defer res.Body.Close()
 
-			assert.Equal(t, res.StatusCode, tc.expectedCode)
+			assert.Equal(t, tc.expectedCode, res.StatusCode)
 		})
 	}
 }
