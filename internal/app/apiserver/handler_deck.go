@@ -119,6 +119,7 @@ func (s *server) handleDeckListCards() APIFunc {
 	}
 }
 
+// Get the list of decks that belong to the current user
 func (s *server) handleDecksList() APIFunc {
 	type response struct {
 		Decks []model.Deck `json:"decks"`
@@ -140,7 +141,6 @@ func (s *server) handleDecksList() APIFunc {
 		}
 		return WriteJSON(w, http.StatusOK, res)
 	}
-
 }
 
 func (s *server) handleDeckRename() APIFunc {

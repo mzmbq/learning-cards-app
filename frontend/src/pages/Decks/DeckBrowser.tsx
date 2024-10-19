@@ -28,7 +28,7 @@ function DeckBrowser() {
   const fetchDecks = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`${CONFIG.backendURL}/api/decks/list`, {
+      const response = await fetch(`${CONFIG.backendURL}/api/deck/list`, {
         method: "GET",
         credentials: "include",
       });
@@ -87,7 +87,7 @@ function DeckBrowser() {
       const response = await fetch(
         `${CONFIG.backendURL}/api/deck/delete/${id}`,
         {
-          method: "GET",
+          method: "DELETE",
           credentials: "include",
         }
       );

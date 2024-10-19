@@ -153,7 +153,7 @@ func TestServer_handlerUserSignOut(t *testing.T) {
 	assert.Equal(t, http.StatusOK, res.StatusCode)
 
 	// Logout
-	req = httptest.NewRequest(http.MethodGet, "/api/user/signout", nil)
+	req = httptest.NewRequest(http.MethodGet, "/api/user/sign-out", nil)
 	for _, c := range cookies {
 		req.AddCookie(c)
 	}

@@ -57,7 +57,7 @@ function CardCreator() {
     setLoading(true);
 
     try {
-      const response = await fetch(`${CONFIG.backendURL}/api/decks/list`, {
+      const response = await fetch(`${CONFIG.backendURL}/api/deck/list`, {
         method: "GET",
         credentials: "include",
       });
@@ -81,7 +81,7 @@ function CardCreator() {
       if (deck !== undefined) {
         setCurrentDeck(deck);
       } else {
-        setError(`invalid deck id "${deckID}"`);
+        setError(`could not find the deck with id "${deckID}"`);
       }
     } catch (error: any) {
       console.error(error);
