@@ -76,21 +76,23 @@ type DeckRepository struct {
 
 func (r *DeckRepository) Create(d *model.Deck) error {
 	return r.store.db.QueryRow(
-		"INSERT INTO decks (name, user_id) VALUES ($1, $2) RETURNING id",
+		"INSERT INTO decks (name, user_id, background) VALUES ($1, $2, $3) RETURNING id",
 		d.Name,
 		d.UserID,
+		d.Background,
 	).Scan(&d.ID)
 }
 
 func (r *DeckRepository) Find(id int) (*model.Deck, error) {
 	d := &model.Deck{}
 	err := r.store.db.QueryRow(
-		"SELECT id, name, user_id FROM decks WHERE id = $1",
+		"SELECT id, name, user_id, background FROM decks WHERE id = $1",
 		id,
 	).Scan(
 		&d.ID,
 		&d.Name,
 		&d.UserID,
+		&d.Background,
 	)
 
 	if err != nil {
@@ -104,7 +106,7 @@ func (r *DeckRepository) Find(id int) (*model.Deck, error) {
 }
 
 func (r *DeckRepository) FindAllByUserID(id int) ([]model.Deck, error) {
-	rows, err := r.store.db.Query("SELECT id, name, user_id FROM decks WHERE user_id = $1",
+	rows, err := r.store.db.Query("SELECT id, name, user_id, background FROM decks WHERE user_id = $1",
 		id,
 	)
 	if err != nil {
@@ -122,6 +124,7 @@ func (r *DeckRepository) FindAllByUserID(id int) ([]model.Deck, error) {
 			&d.ID,
 			&d.Name,
 			&d.UserID,
+			&d.Background,
 		)
 		if err != nil {
 			return nil, err
@@ -174,10 +177,11 @@ func (r *DeckRepository) Delete(id int) error {
 }
 
 func (r *DeckRepository) Update(deck *model.Deck) error {
-	res, err := r.store.db.Exec("UPDATE decks SET name = $1, user_id = $2 WHERE id = $3",
+	res, err := r.store.db.Exec("UPDATE decks SET name = $2, user_id = $3, background = $4 WHERE id = $1",
+		deck.ID,
 		deck.Name,
 		deck.UserID,
-		deck.ID,
+		deck.Background,
 	)
 	if err != nil {
 		return err

@@ -11,7 +11,8 @@ import (
 
 func (s *server) handleDeckCreate() APIFunc {
 	type request struct {
-		DeckName string `json:"deckname"`
+		DeckName   string `json:"deckname"`
+		Background string `json:"background"`
 	}
 	type response struct {
 		DeckID int `json:"deck_id"`
@@ -29,9 +30,11 @@ func (s *server) handleDeckCreate() APIFunc {
 		}
 
 		d := model.Deck{
-			Name:   req.DeckName,
-			UserID: u.ID,
+			Name:       req.DeckName,
+			UserID:     u.ID,
+			Background: req.Background,
 		}
+		d.BeforeCreate()
 
 		if err := d.Validate(); err != nil {
 			return ValidationErrors(err)
