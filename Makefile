@@ -11,6 +11,10 @@ build:
 run: build
 	@./bin/apiserver
 
+.PHONY: run_live
+run_live: build
+	@air --build.cmd "make build" --build.bin "make run" 
+
 .PHONY: run_frontend
 run_frontend:
 	@cd frontend && npm start
