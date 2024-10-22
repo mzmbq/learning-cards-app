@@ -15,6 +15,8 @@ type Middleware func(http.Handler) http.Handler
 func (s *server) withCORS(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Vary", "Origin")
+		// Used by preflight cross-origin requests
+		w.Header().Add("Vary", "Access-Control-Request-Method")
 
 		origin := r.Header.Get("Origin")
 		if origin == "" {
@@ -22,10 +24,20 @@ func (s *server) withCORS(h http.Handler) http.Handler {
 			return
 		}
 
-		for _, o := range s.CORSOrigins {
-			if origin == o {
-				w.Header().Set("Access-Control-Allow-Origin", o)
+		for _, trustedOrigin := range s.CORSOrigins {
+			if origin == trustedOrigin {
+				w.Header().Set("Access-Control-Allow-Origin", trustedOrigin)
 				w.Header().Set("Access-Control-Allow-Credentials", "true")
+
+				// Check if the request is a preflight request
+				if r.Method == "OPTIONS" && r.Header.Get("Access-Control-Request-Method") != "" {
+					w.Header().Set("Access-Control-Allow-Methods", "OPTIONS, DELETE")
+					w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+
+					w.WriteHeader(http.StatusOK)
+					return
+				}
+
 				break
 			}
 		}
