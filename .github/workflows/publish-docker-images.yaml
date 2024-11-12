@@ -2,8 +2,8 @@ name: Build and Push Docker Images
 
 on:
   push:
-    branches:
-      - master
+    tags:
+      - "v*.*.*"
 
 jobs:
   build:
@@ -25,7 +25,9 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/lca-backend:latest
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/lca-backend:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/lca-backend:${{ github.ref_name }}
 
       - name: Build and push frontend image
         uses: docker/build-push-action@v3
@@ -33,4 +35,6 @@ jobs:
           context: .
           file: ./frontend/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/lca-frontend:latest
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/lca-frontend:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/lca-frontend:${{ github.ref_name }}
