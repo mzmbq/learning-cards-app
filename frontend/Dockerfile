@@ -4,8 +4,8 @@ WORKDIR /app
 
 COPY frontend/package*.json .
 
-# Set the environment variables
-# ENV REACT_APP_BACKEND_URL_DEVELOPMENT=http://localhost:8080
+# NOTE: This placeholder URL will be replaced at entrypoint via environment variable
+# LINK ./entrypoint.sh
 ENV REACT_APP_BACKEND_URL_PRODUCTION=https://api.example.com
 
 RUN npm install
