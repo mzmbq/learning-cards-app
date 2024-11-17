@@ -10,7 +10,7 @@ require (
 	github.com/gorilla/sessions v1.2.2
 	github.com/jackc/pgx/v5 v5.5.5
 	github.com/kelseyhightower/envconfig v1.4.0
-	github.com/stretchr/testify v1.8.4
+	github.com/stretchr/testify v1.9.0
 	golang.org/x/crypto v0.25.0
 	golang.org/x/time v0.5.0
 )
