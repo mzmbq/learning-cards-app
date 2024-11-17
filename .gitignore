@@ -1,3 +1,5 @@
 .vscode
 .env
 bin/apiserver
+certs/*.key
+certs/*.crt
